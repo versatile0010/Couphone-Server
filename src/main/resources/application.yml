@@ -11,6 +11,8 @@ cloud:
       auto: false
     stack:
       auto: false
+    cloudfront:
+      domain: ${CLOUDFRONT_DOMAIN}
 
 logging:
   level:

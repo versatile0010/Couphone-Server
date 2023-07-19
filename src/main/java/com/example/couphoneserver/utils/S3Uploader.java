@@ -46,6 +46,9 @@ public class S3Uploader {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
+    @Value("${cloud.aws.cloudfront.domain}")
+    private String domain;
+
     private AmazonS3 amazonS3Client;
 
     @PostConstruct
@@ -123,6 +126,6 @@ public class S3Uploader {
         }catch(IOException e){
            log.error("IMAGE UPLOAD FAILED");
         }
-        return amazonS3Client.getUrl(bucket, fileName).toString();
+        return domain+"/"+fileName;
     }
 }

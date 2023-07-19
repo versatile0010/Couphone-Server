@@ -99,4 +99,7 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+# akfrdma0125#
+convention.md
+
 # End of https://www.toptal.com/developers/gitignore/api/windows,macos
