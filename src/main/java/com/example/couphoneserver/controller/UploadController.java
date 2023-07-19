@@ -18,9 +18,9 @@ public class UploadController {
     private final S3Uploader s3Uploader;
 
     @PostMapping(value="",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public String post(
+    public String postImage(
             @RequestPart("file") MultipartFile multipartFile) {
-        log.error("upload");
+        log.error("[UploadController.upload]");
         return s3Uploader.upload(multipartFile);
     }
 }
