@@ -1,0 +1,68 @@
+# AWS 설정
+cloud:
+  aws:
+    s3:
+      bucket: couphone-bucket
+    credentials:
+      access-key: ${S3_ACCESS_KEY}
+      secret-key: ${S3_SECRET_KEY}
+    region:
+      static: ap-northeast-2
+      auto: false
+    stack:
+      auto: false
+
+logging:
+  level:
+    com:
+      amazonaws:
+        util:
+          EC2MetadataUtils: ERROR
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 10MB
+  profiles:
+    group:
+      "dev": "devDB,Port,JPA"
+
+---
+spring:
+  config:
+    active:
+      on-profile: "devDB"
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DATASOURCE_URL_DEV}
+    username: ${DATASOURCE_USERNAME_DEV}
+    password: ${DATASOURCE_PASSWORD_DEV}
+    dbcp2:
+      validation-query: select 1
+  sql:
+    init:
+      platform: mysql
+---
+
+spring:
+  config:
+    activate:
+      on-profile: "Port"
+server:
+  port: 8080
+---
+
+spring:
+  config:
+    activate:
+      on-profile: "JPA"
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
