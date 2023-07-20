@@ -12,8 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *  Member (회원 정보) 엔티티
- *  MemberCouponItem(회원 쿠폰) 과 1:N 연관관계
+ * Member (회원 정보) 엔티티
  */
 
 @Getter
@@ -21,21 +20,23 @@ import java.util.List;
 @Entity
 @Table(name = "MEMBER")
 public class Member extends BaseTimeEntity {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")
     private Long id;
     private String name;
     private String email;
+    private String phoneNumber;
     @Enumerated(EnumType.STRING)
     private MemberGrade grade;
     @Enumerated(EnumType.STRING)
     private MemberStatus status;
 
     @OneToMany(mappedBy = "member")
-    private List<MemberCouponItem> coupons = new ArrayList<>();
+    private List<CouponItem> coupons = new ArrayList<>();
 
     @Builder
-    public Member(String name, String email, MemberGrade grade){
+    public Member(String name, String email, MemberGrade grade) {
         this.name = name;
         this.email = email;
         this.grade = grade;
