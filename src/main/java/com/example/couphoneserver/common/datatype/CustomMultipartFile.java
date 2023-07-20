@@ -1,4 +1,4 @@
-package com.example.couphoneserver.utils;
+package com.example.couphoneserver.common.datatype;
 
 import org.springframework.util.Assert;
 import org.springframework.util.FileCopyUtils;

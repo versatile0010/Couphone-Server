@@ -8,6 +8,7 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.example.couphoneserver.common.datatype.CustomMultipartFile;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +26,6 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -90,7 +90,7 @@ public class S3Uploader {
             int originWidth = image.getWidth();
             int originHeight = image.getHeight();
 
-            // origin 이미지가 400보다 작으면 패스
+            // origin 이미지가 width 보다 작으면 패스
             if(originWidth < width)
                 return originalImage;
 
