@@ -28,7 +28,7 @@ spring:
       max-request-size: 10MB
   profiles:
     group:
-      "dev": "devDB,Port,JPA"
+      "dev": "devDB,Port,JPA,secret,web-mvc"
 
 ---
 spring:
@@ -68,3 +68,32 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: "secret"
+
+secret:
+  jwt-secret-key: ${JWT_SECRET_KEY}
+  jwt-expired-in: ${JWT_EXPIRED_IN}
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: "web-mvc"
+
+  mvc:
+    throw-exception-if-no-handler-found: true
+
+  web:
+    resources:
+      add-mappings: false
+
+  messages:
+    basename: errors

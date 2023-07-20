@@ -1,5 +1,6 @@
 package com.example.couphoneserver.controller;
 
+import com.example.couphoneserver.common.annotation.NoAuth;
 import com.example.couphoneserver.utils.S3Uploader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class UploadController {
     private final S3Uploader s3Uploader;
 
+    @NoAuth
     @PostMapping(value="",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public String postImage(
             @RequestPart("file") MultipartFile multipartFile) {
