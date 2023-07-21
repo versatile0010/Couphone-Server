@@ -19,11 +19,14 @@ public enum BaseExceptionResponseStatus implements ResponseStatus {
     METHOD_NOT_ALLOWED(2002, HttpStatus.METHOD_NOT_ALLOWED.value(), "해당 URL에서는 지원하지 않는 HTTP Method 입니다."),
 
     /**
-     * 3000: Server, Database 오류 (INTERNAL_SERVER_ERROR)
+     * 3000: Server, Database, AWS 오류 (INTERNAL_SERVER_ERROR)
      */
     SERVER_ERROR(3000, HttpStatus.INTERNAL_SERVER_ERROR.value(), "서버에서 오류가 발생하였습니다."),
     DATABASE_ERROR(3001, HttpStatus.INTERNAL_SERVER_ERROR.value(), "데이터베이스에서 오류가 발생하였습니다."),
     BAD_SQL_GRAMMAR(3002, HttpStatus.INTERNAL_SERVER_ERROR.value(), "SQL에 오류가 있습니다."),
+    FILE_UPLOAD_FAILED(3003, HttpStatus.INTERNAL_SERVER_ERROR.value(), "파일 업로드에 실패했습니다."),
+    IMAGE_RESIZE_ERROR(3004,HttpStatus.INTERNAL_SERVER_ERROR.value(),"파일 크기 조정에 실패했습니다."),
+    INVALID_FILE_FORMAT(3005, HttpStatus.INTERNAL_SERVER_ERROR.value(),"파일 형식이 이미지가 아닙니다."),
 
     /**
      * 4000: Authorization 오류

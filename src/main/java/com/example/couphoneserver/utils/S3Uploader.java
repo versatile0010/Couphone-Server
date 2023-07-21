@@ -9,6 +9,7 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.example.couphoneserver.common.datatype.CustomMultipartFile;
+import com.example.couphoneserver.common.exception.DatabaseException;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,8 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.UUID;
+
+import static com.example.couphoneserver.common.response.status.BaseExceptionResponseStatus.*;
 
 @Service
 @Slf4j
@@ -65,16 +68,16 @@ public class S3Uploader {
 
     public String upload(MultipartFile image) {
 
-        if(Objects.requireNonNull(image.getContentType()).contains("image")) {  //이미지가 있다면 실행하고 없다면 패스
-
-            String fileName = createFileName(image);//중복되지않게 이름을  randomUUID()를 사용해서 생성함
-            String fileFormat = image.getContentType().substring(image.getContentType().lastIndexOf("/") + 1); //파일 확장자명 추출
-
-            MultipartFile resizedImage = resizer(fileName, fileFormat, image, 100); //오늘의 핵심 메서드
-
-            return putS3(resizedImage, fileName);
+        if(!Objects.requireNonNull(image.getContentType()).contains("image")) {  //이미지가 있다면 실행하고 없다면 패스
+            throw new DatabaseException(INVALID_FILE_FORMAT);
         }
-        return "failed!!!";
+
+        String fileName = createFileName(image);//중복되지않게 이름을  randomUUID()를 사용해서 생성함
+        String fileFormat = image.getContentType().substring(image.getContentType().lastIndexOf("/") + 1); //파일 확장자명 추출
+
+        MultipartFile resizedImage = resizer(fileName, fileFormat, image, 100); //오늘의 핵심 메서드
+
+        return putS3(resizedImage, fileName);
     }
 
     private String createFileName(MultipartFile image) {
@@ -110,7 +113,7 @@ public class S3Uploader {
             return new CustomMultipartFile(fileName,fileFormat,originalImage.getContentType(), baos.toByteArray());
 
         } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일을 줄이는데 실패했습니다.");
+            throw new DatabaseException(IMAGE_RESIZE_ERROR);
         }
     }
 
@@ -124,7 +127,7 @@ public class S3Uploader {
             amazonS3Client.putObject(new PutObjectRequest(bucket, fileName, file.getInputStream(), metadata)
                     .withCannedAcl(CannedAccessControlList.PublicRead));
         }catch(IOException e){
-           log.error("IMAGE UPLOAD FAILED");
+           throw new DatabaseException(FILE_UPLOAD_FAILED);
         }
         return domain+"/"+fileName;
     }
