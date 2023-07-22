@@ -1,4 +1,4 @@
-package com.example.couphoneserver.domain.service;
+package com.example.couphoneserver.service;
 
 import com.example.couphoneserver.domain.entity.Member;
 import com.example.couphoneserver.repository.MemberRepository;

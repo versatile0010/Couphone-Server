@@ -3,6 +3,7 @@ package com.example.couphoneserver.domain.service;
 import com.example.couphoneserver.domain.MemberGrade;
 import com.example.couphoneserver.domain.entity.Member;
 import com.example.couphoneserver.repository.MemberRepository;
+import com.example.couphoneserver.service.MemberService;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;

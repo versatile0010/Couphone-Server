@@ -2,9 +2,7 @@ package com.example.couphoneserver.domain.entity;
 
 import com.example.couphoneserver.domain.BrandStatus;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +10,8 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
+@Builder
+@AllArgsConstructor
 @Table(name = "BRAND")
 public class Brand extends BaseTimeEntity{
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
