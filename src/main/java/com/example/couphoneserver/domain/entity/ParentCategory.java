@@ -1,9 +1,7 @@
 package com.example.couphoneserver.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +9,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
+@ToString
 @Table(name = "PARENT_CATEGORY")
 public class ParentCategory extends BaseTimeEntity {
     @Id
@@ -25,4 +24,8 @@ public class ParentCategory extends BaseTimeEntity {
     @OneToOne(mappedBy = "parentCategory", fetch = FetchType.LAZY)
     private Brand brand;
 
+    @Builder
+    public ParentCategory(String name) {
+        this.name = name;
+    }
 }
