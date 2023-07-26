@@ -1,13 +1,15 @@
 package com.example.couphoneserver.domain.service;
 
-import com.example.couphoneserver.domain.MemberGrade;
 import com.example.couphoneserver.domain.entity.Member;
 import com.example.couphoneserver.repository.MemberRepository;
+import com.example.couphoneserver.service.MemberService;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,10 +17,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
+@ActiveProfiles("dev")
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@Rollback
 @Transactional
 public class MemberServiceTest {
     @Autowired
@@ -36,8 +41,8 @@ public class MemberServiceTest {
         // given
         Member member = Member.builder()
                 .name("kim")
-                .email("siam0294@naver.com")
-                .grade(MemberGrade.ROLE_MEMBER)
+                .phoneNumber("010-1111-1111")
+                .password("1234")
                 .build();
         // when
         Long savedId = memberService.join(member);
@@ -49,23 +54,25 @@ public class MemberServiceTest {
         assertEquals(member.getEmail(), findMember.getEmail());
     }
 
+    @Rollback
+
     @Test(expected = IllegalStateException.class)
     public void 회원_중복이름_가입시도하면_예외처리() throws Exception {
         // given
         Member memberKim1 = Member.builder()
                 .name("kim")
-                .email("siam0294@naver.com")
-                .grade(MemberGrade.ROLE_MEMBER)
+                .phoneNumber("010-1111-1111")
+                .password("1234")
                 .build();
         Member memberKim2 = Member.builder()
                 .name("kim")
-                .email("hh@hh.com")
-                .grade(MemberGrade.ROLE_MEMBER)
+                .phoneNumber("010-2222-2222")
+                .password("1234")
                 .build();
         Member memberLee = Member.builder()
                 .name("lee")
-                .email("hh@hh.com")
-                .grade(MemberGrade.ROLE_ADMIN)
+                .phoneNumber("010-3333-3333")
+                .password("1234")
                 .build();
         memberService.join(memberKim1);
         // when
@@ -81,19 +88,19 @@ public class MemberServiceTest {
     public void 회원_전체조회() throws Exception {
         // given
         Member member1 = Member.builder()
-                .name("lee")
-                .email("siam0294@naver.com")
-                .grade(MemberGrade.ROLE_MEMBER)
+                .name("yee")
+                .phoneNumber("010-1111-1111")
+                .password("1234")
                 .build();
         Member member2 = Member.builder()
-                .name("lim")
-                .email("hh@hh.com")
-                .grade(MemberGrade.ROLE_MEMBER)
+                .name("kim")
+                .phoneNumber("010-2222-2222")
+                .password("1234")
                 .build();
         Member member3 = Member.builder()
-                .name("yoo")
-                .email("hh@hh.com")
-                .grade(MemberGrade.ROLE_ADMIN)
+                .name("lee")
+                .phoneNumber("010-3333-3333")
+                .password("1234")
                 .build();
         // when
         memberService.join(member1);
@@ -109,19 +116,19 @@ public class MemberServiceTest {
     public void 회원_단건조회() throws Exception {
         // given
         Member member1 = Member.builder()
-                .name("lee")
-                .email("siam0294@naver.com")
-                .grade(MemberGrade.ROLE_MEMBER)
+                .name("kim")
+                .phoneNumber("010-1111-1111")
+                .password("1234")
                 .build();
         Member member2 = Member.builder()
-                .name("lim")
-                .email("hh@hh.com")
-                .grade(MemberGrade.ROLE_MEMBER)
+                .name("yoo")
+                .phoneNumber("010-2222-2222")
+                .password("1234")
                 .build();
         Member member3 = Member.builder()
-                .name("yoo")
-                .email("hh@hh.com")
-                .grade(MemberGrade.ROLE_ADMIN)
+                .name("lee")
+                .phoneNumber("010-3333-3333")
+                .password("1234")
                 .build();
         // when
         memberService.join(member1);
@@ -137,28 +144,29 @@ public class MemberServiceTest {
         assertThat(findMember2).isEqualTo(member2);
         assertThat(findMember3).isEqualTo(member3);
     }
-    
+
     @Test(expected = IllegalArgumentException.class)
     public void 회원_유효하지_않은_id로_조회하면_예외처리() throws Exception {
         // given
         Member member = Member.builder()
                 .name("lee")
-                .email("siam0294@naver.com")
-                .grade(MemberGrade.ROLE_MEMBER)
+                .phoneNumber("010-1111-2222")
+                .password("1234")
                 .build();
         // when
         memberService.join(member);
         // then
-        Member findMember = memberService.findOneById(member.getId()+100);
+        Member findMember = memberService.findOneById(member.getId() + 100);
     }
+
     @Test
     public void 회원_생성시간_수정시간_올바른지() throws Exception {
         // given
         LocalDateTime now = LocalDateTime.of(2023, 7, 20, 0, 0, 0);
         Member member = Member.builder()
                 .name("lee")
-                .email("siam0294@naver.com")
-                .grade(MemberGrade.ROLE_MEMBER)
+                .phoneNumber("010-1111-2222")
+                .password("1234")
                 .build();
         // when
         memberService.join(member);

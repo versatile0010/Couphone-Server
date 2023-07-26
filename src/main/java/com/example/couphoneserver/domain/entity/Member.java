@@ -7,8 +7,13 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -19,26 +24,94 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "MEMBER")
-public class Member extends BaseTimeEntity {
+public class Member extends BaseTimeEntity implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "member_id")
+    @Column(name = "member_id", updatable = false)
     private Long id;
+    @Column(name = "name")
     private String name;
+    @Column(name = "email")
     private String email;
+    @Column(name = "phone_number", nullable = false, unique = true)
     private String phoneNumber;
+    @Column(name = "password")
+    private String password;
+    @Column(name = "grade")
+    @ColumnDefault("ROLE_MEMBER")
     @Enumerated(EnumType.STRING)
-    private MemberGrade grade;
+    private MemberGrade grade = MemberGrade.ROLE_MEMBER;
+    @Column(name = "status")
+    @ColumnDefault("ACTIVE")
     @Enumerated(EnumType.STRING)
-    private MemberStatus status;
+    private MemberStatus status = MemberStatus.ACTIVE;
 
     @OneToMany(mappedBy = "member")
     private List<CouponItem> coupons = new ArrayList<>();
 
+
     @Builder
-    public Member(String name, String email, MemberGrade grade) {
+    public Member(String name, String phoneNumber, String password, String auth) {
         this.name = name;
-        this.email = email;
-        this.grade = grade;
+        this.phoneNumber = phoneNumber;
+        this.password = password;
+    }
+
+    // [Spring Security] 사용자 인증 정보 접근
+
+    /**
+     * 사용자가 가지고 있는 권한의 목록을 반환
+     */
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("USER"), new SimpleGrantedAuthority("ADMIN"));
+    }
+
+    /**
+     * 사용자의 비밀번호를 반환
+     */
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
+    /**
+     * 사용자를 식별할 수 있는 사용자 이름을 반환함
+     */
+    @Override
+    public String getUsername() {
+        return phoneNumber; // 사용자의 고유한 값을 반환
+    }
+
+    /**
+     * 만료된 계정이면 false 를 반환
+     */
+    @Override
+    public boolean isAccountNonExpired() {
+        return true; // 유효
+    }
+
+    /**
+     * 잠겨진 계정이면 false 를 반환
+     */
+    @Override
+    public boolean isAccountNonLocked() {
+        return true; // unlock
+    }
+
+    /**
+     * 만료되지 않은 비밀번호이면 true 를 반환
+     */
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true; // 유효
+    }
+
+    /**
+     * 사용가능한 계정이면 true 를 반환
+     */
+    @Override
+    public boolean isEnabled() {
+        return true; // 사용가능
     }
 }
