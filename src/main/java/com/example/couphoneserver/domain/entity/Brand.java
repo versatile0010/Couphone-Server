@@ -13,13 +13,13 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "BRAND")
-public class Brand extends BaseTimeEntity{
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class Brand extends BaseTimeEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "brand_id")
     private Long id;
     private String name;
     private String rewardDescription;
-
     @Enumerated(EnumType.STRING)
     private BrandStatus status;
 
@@ -32,6 +32,6 @@ public class Brand extends BaseTimeEntity{
     private List<Store> stores = new ArrayList<>(); // 해당 브랜드의 매장들
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_category_id")
-    private ParentCategory parentCategory;
+    @JoinColumn(name = "category_id")
+    private Category category;
 }
