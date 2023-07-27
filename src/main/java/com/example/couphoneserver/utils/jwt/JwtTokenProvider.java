@@ -81,4 +81,16 @@ public class JwtTokenProvider implements InitializingBean {
     public void afterPropertiesSet() throws Exception {
         this.key = Keys.hmacShaKeyFor(JWT_SECRET_KEY.getBytes(StandardCharsets.UTF_8));
     }
+
+    public Long getUserId(String token) {
+        Claims claims = getClaims(token);
+        return claims.get("id", Long.class);
+    }
+    private Claims getClaims(String token){
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
 }
