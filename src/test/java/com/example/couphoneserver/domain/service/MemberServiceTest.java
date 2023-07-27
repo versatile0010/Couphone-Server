@@ -3,8 +3,8 @@ package com.example.couphoneserver.domain.service;
 import com.example.couphoneserver.domain.entity.Member;
 import com.example.couphoneserver.repository.MemberRepository;
 import com.example.couphoneserver.service.MemberService;
-import org.junit.After;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,7 +23,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 @ActiveProfiles("dev")
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@Rollback
 @Transactional
 public class MemberServiceTest {
     @Autowired
@@ -31,7 +30,7 @@ public class MemberServiceTest {
     @Autowired
     MemberRepository memberRepository;
 
-    @After
+    @BeforeEach
     public void cleanUp() {
         memberRepository.deleteAll();
     }
@@ -87,6 +86,7 @@ public class MemberServiceTest {
     @Test
     public void 회원_전체조회() throws Exception {
         // given
+        memberRepository.deleteAll();
         Member member1 = Member.builder()
                 .name("yee")
                 .phoneNumber("010-1111-1111")
