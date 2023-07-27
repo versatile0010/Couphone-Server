@@ -2,7 +2,8 @@ package com.example.couphoneserver.service;
 
 import com.example.couphoneserver.domain.entity.Member;
 import com.example.couphoneserver.dto.member.AddMemberRequest;
-import com.example.couphoneserver.dto.member.AddMemberResponse;
+import com.example.couphoneserver.dto.member.MemberInfoResponseDto;
+import com.example.couphoneserver.dto.member.MemberResponseDto;
 import com.example.couphoneserver.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -28,7 +29,7 @@ public class MemberService {
      *  휴대폰 번호로 회원 가입
      */
     @Transactional
-    public AddMemberResponse save(AddMemberRequest dto) throws UsernameNotFoundException {
+    public MemberResponseDto save(AddMemberRequest dto) throws UsernameNotFoundException {
         validateDuplicateMemberByPhoneNumber(dto.getPhoneNumber());
         validateDuplicateMemberByName(dto.getName());
         Member savedMember = memberRepository.save(Member.builder()
@@ -37,7 +38,7 @@ public class MemberService {
                 .password(bCryptPasswordEncoder.encode(dto.getPassword())) // bCryptPasswordEncoder.encode
                 .build()
         );
-        return new AddMemberResponse(savedMember);
+        return new MemberResponseDto(savedMember);
     }
 
     /**
@@ -48,6 +49,21 @@ public class MemberService {
         validateDuplicateMemberByName(member.getName());
         memberRepository.save(member);
         return member.getId();
+    }
+
+    /**
+     * 회원 탈퇴 처리
+     */
+    @Transactional
+    public MemberResponseDto delete(Member member){
+        member.setTerminated();
+        return new MemberResponseDto(member);
+    }
+    /**
+     * 단일 회원 정보 조회
+     */
+    public MemberInfoResponseDto getMemberInfo(Member member){
+        return new MemberInfoResponseDto(member);
     }
 
     /**

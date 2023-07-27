@@ -114,4 +114,8 @@ public class Member extends BaseTimeEntity implements UserDetails {
     public boolean isEnabled() {
         return true; // 사용가능
     }
+
+    public void setTerminated(){
+        status = MemberStatus.TERMINATED;
+    }
 }
