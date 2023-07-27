@@ -23,7 +23,7 @@ public class BrandController {
     private final BrandService brandService;
 
     @PostMapping("")
-    @Operation(summary = "브랜드 등록", description = "Request Body에 브랜드 이름, 보상 설명, 이미지 url 담아서 보내주세요!")
+    @Operation(summary = "브랜드 등록", description = "Request Body에 브랜드 이름, 보상 설명, 이미지 url, 카테고리 id 담아서 보내주세요!")
     public BaseResponse<PostBrandResponse> postBrand(@RequestBody PostBrandRequest request){
         return new BaseResponse<>(brandService.saveBrand(request));
     }
