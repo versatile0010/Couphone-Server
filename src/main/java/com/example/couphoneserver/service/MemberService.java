@@ -1,5 +1,6 @@
 package com.example.couphoneserver.service;
 
+import com.example.couphoneserver.common.exception.MemberException;
 import com.example.couphoneserver.domain.entity.Member;
 import com.example.couphoneserver.dto.member.AddMemberRequest;
 import com.example.couphoneserver.dto.member.MemberInfoResponseDto;
@@ -13,6 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+
+import static com.example.couphoneserver.common.response.status.BaseExceptionResponseStatus.DUPLICATED_MEMBER_EXCEPTION;
+import static com.example.couphoneserver.common.response.status.BaseExceptionResponseStatus.MEMBER_NOT_FOUND;
 
 /**
  * 회원 관련 비지니스 로직
@@ -72,7 +76,7 @@ public class MemberService {
     private void validateDuplicateMemberByName(String name) {
         List<Member> findMembers = memberRepository.findByName(name);
         if (!findMembers.isEmpty()) {
-            throw new IllegalStateException("  이미 존재하는 회원입니다.  ");
+            throw new MemberException(DUPLICATED_MEMBER_EXCEPTION);
         }
     }
 
@@ -88,7 +92,7 @@ public class MemberService {
      */
     public Member findOneById(Long memberId) {
         return memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("  주어진 id 와 매칭하는 회원을 찾을 수 없습니다.  "));
+                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
     }
 
     /**
@@ -97,7 +101,7 @@ public class MemberService {
     private void validateDuplicateMemberByPhoneNumber(String phoneNumber) {
         Optional<Member> optionalUser = memberRepository.findByPhoneNumber(phoneNumber);
         optionalUser.ifPresent(findUser -> {
-            throw new IllegalArgumentException(" 휴대폰 번호가 중복입니다! ");
+            throw new MemberException(DUPLICATED_MEMBER_EXCEPTION);
         });
     }
     /**
