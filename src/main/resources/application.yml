@@ -1,4 +1,4 @@
-# AWS 설정
+---
 cloud:
   aws:
     s3:
@@ -13,14 +13,12 @@ cloud:
       auto: false
     cloudfront:
       domain: ${CLOUDFRONT_DOMAIN}
-
 logging:
   level:
     com:
       amazonaws:
         util:
           EC2MetadataUtils: ERROR
-
 spring:
   servlet:
     multipart:
@@ -28,14 +26,13 @@ spring:
       max-request-size: 10MB
   profiles:
     group:
-      "dev": "devDB,Port,JPA,secret,web-mvc"
+      dev: devDB,Port,JPA,secret,web-mvc
 
 ---
 spring:
   config:
     activate:
-      on-profile: "devDB"
-
+      on-profile: devDB
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: ${DATASOURCE_URL_DEV}
@@ -46,21 +43,20 @@ spring:
   sql:
     init:
       platform: mysql
----
 
+---
 spring:
   config:
     activate:
-      on-profile: "Port"
+      on-profile: Port
 server:
   port: 8080
----
 
+---
 spring:
   config:
     activate:
-      on-profile: "JPA"
-
+      on-profile: JPA
   jpa:
     hibernate:
       ddl-auto: create
@@ -69,29 +65,23 @@ spring:
         format_sql: true
 
 ---
-
 spring:
   config:
     activate:
-      on-profile: "secret"
-
+      on-profile: secret
 secret:
   jwt-secret-key: ${JWT_SECRET_KEY}
   jwt-expired-in: ${JWT_EXPIRED_IN}
 
 ---
-
 spring:
   config:
     activate:
-      on-profile: "web-mvc"
-
+      on-profile: web-mvc
   mvc:
     throw-exception-if-no-handler-found: true
-
   web:
     resources:
       add-mappings: false
-
   messages:
     basename: errors
