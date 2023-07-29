@@ -1,5 +1,6 @@
 package com.example.couphoneserver.dto.brand;
 
+import com.example.couphoneserver.domain.BrandStatus;
 import com.example.couphoneserver.domain.entity.Brand;
 import com.example.couphoneserver.domain.entity.Category;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -15,9 +16,11 @@ public class PostBrandRequest {
     @Schema(description = "브랜드 이름", example = "메가커피")
     @NotNull
     private String name;
+
     @Schema(description = "보상 방법 (쿠폰 혜택)", example = "아이스 아메리카노 1잔 무료")
     @NotNull
     private String rewardDescription;
+
     @Schema(description = "브랜드 로고 URL", example = "----")
     @NotNull
     private String brandImageUrl;
@@ -32,6 +35,7 @@ public class PostBrandRequest {
                 .rewardDescription(rewardDescription)
                 .brandImageUrl(brandImageUrl)
                 .category(category)
+                .status(BrandStatus.ACTIVE)
                 .build();
     }
 }
