@@ -79,4 +79,31 @@ public class BrandService {
 
         return brandList;
     }
+
+    public List<GetBrandResponse> findByNameContaining(Long mid, String name) {
+        List<GetBrandResponse> brandList = new ArrayList<>();
+
+        // 멤버 존재하는지 검사
+        memberRepository.findById(mid)
+                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
+
+
+        // 검색어로 브랜드 찾기
+        List<Brand> brands = brandRepository.findAllByNameContaining(name)
+                .orElseThrow(() -> new BrandException(BRAND_NOT_FOUND));
+
+        for (Brand brand : brands) {
+            // 쿠폰 찾기
+            CouponItem couponItem = couponItemRepository.findByMemberIdAndBrandIdAndStatus(mid, brand.getId(), CouponItemStatus.ACTIVE);
+
+            if (couponItem == null) { // 해당 브랜드에 쿠폰이 없을 경우
+                brandList.add(new GetBrandResponse(brand, 0));
+            } else { // 해당 브랜드에 쿠폰이 있을 경우
+                brandList.add(new GetBrandResponse(brand, couponItem.getStampCount()));
+            }
+        }
+
+        return brandList;
+    }
+
 }
