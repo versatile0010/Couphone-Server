@@ -19,6 +19,7 @@ public class CouponService {
     private final MemberRepository memberRepository;
     private final CouponItemRepository couponItemRepository;
     private final BrandRepository brandRepository;
-    
+
+    //
 
 }
