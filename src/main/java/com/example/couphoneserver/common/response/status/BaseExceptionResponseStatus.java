@@ -48,7 +48,8 @@ public enum BaseExceptionResponseStatus implements ResponseStatus {
     /**
      * 7000: 브랜드 오류
      */
-    INVALID_BRAND_VALUE(7000, HttpStatus.BAD_REQUEST.value(), "브랜드 관련 요청에서 오류가 발생하였습니다.");
+    INVALID_BRAND_VALUE(7000, HttpStatus.BAD_REQUEST.value(), "브랜드 관련 요청에서 오류가 발생하였습니다."),
+    DUPLICATE_BRAND_NAME(7001, HttpStatus.BAD_REQUEST.value(), "중복된 브랜드 이름이 존재합니다.");
 
     private final int code;
     private final int status;

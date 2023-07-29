@@ -17,7 +17,7 @@ public class BrandExceptionControllerAdvice {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(BrandException.class)
-    public BaseErrorResponse handle_BrandException(CategoryException e) {
+    public BaseErrorResponse handle_BrandException(BrandException e) {
         return new BaseErrorResponse(INVALID_BRAND_VALUE, e.getMessage());
     }
 

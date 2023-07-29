@@ -1,6 +1,8 @@
 package com.example.couphoneserver.service;
 
+import com.example.couphoneserver.common.exception.BrandException;
 import com.example.couphoneserver.common.exception.CategoryException;
+import com.example.couphoneserver.common.exception.DatabaseException;
 import com.example.couphoneserver.domain.entity.Brand;
 import com.example.couphoneserver.domain.entity.Category;
 import com.example.couphoneserver.dto.brand.PostBrandRequest;
@@ -12,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-import static com.example.couphoneserver.common.response.status.BaseExceptionResponseStatus.CATEGORY_NOT_FOUND;
+import static com.example.couphoneserver.common.response.status.BaseExceptionResponseStatus.*;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +25,11 @@ public class BrandService {
     public PostBrandResponse saveBrand(PostBrandRequest request) {
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new CategoryException(CATEGORY_NOT_FOUND));
+
+        // 브랜드 이름 중복 검사
+        if (brandRepository.existsByName(request.getName())) {
+            throw new BrandException(DUPLICATE_BRAND_NAME);
+        }
 
         Brand brand = request.toEntity(category);
         brandRepository.save(brand);
