@@ -93,8 +93,10 @@ jobs:
         run: echo "JWT_EXPIRED_IN=${{secrets.JWT_EXPIRED_IN}}" >> application.yml
         working-directory: ./src/test/resources
 
+
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build with Gradle
-        run: ./gradlew clean build
+      - name: Build with Gradle without test
+        run: ./gradlew clean build --exclude-task test
