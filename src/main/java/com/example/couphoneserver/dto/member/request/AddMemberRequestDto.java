@@ -1,4 +1,4 @@
-package com.example.couphoneserver.dto.member;
+package com.example.couphoneserver.dto.member.request;
 
 import com.example.couphoneserver.domain.entity.Member;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -6,12 +6,11 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
-@Getter
-@Setter
-@Data
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class AddMemberRequest {
+@Getter
+@ToString
+public class AddMemberRequestDto {
     @NotNull
     @Size(min=3, max=100)
     @Schema(example = "김이름")
