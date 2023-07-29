@@ -1,11 +1,14 @@
 package com.example.couphoneserver.controller;
 
-import com.example.couphoneserver.common.annotation.NoAuth;
-import com.example.couphoneserver.common.response.BaseResponse;
-import com.example.couphoneserver.utils.jwt.JwtTokenProvider;
+import com.example.couphoneserver.dto.member.request.LoginRequestDto;
+import com.example.couphoneserver.dto.member.response.LoginResponseDto;
+import com.example.couphoneserver.service.MemberService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,17 +17,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/auth")
 public class AuthController {
+    private final MemberService memberService;
 
-    private final JwtTokenProvider jwtTokenProvider;
-    @NoAuth
+    //@NoAuth
     @PostMapping("/login")
-    public BaseResponse<String> login(String userId) {
+    @Operation(summary = "로그인(no Oauth2)", description = "로그인하여 access token, refresh token 을 발급합니다.")
+    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto loginRequestDto) {
         log.info("[AuthController.login]");
-
-        log.info(userId);
-
-        String JwtToken = jwtTokenProvider.createToken("data", Long.parseLong(userId));
-
-        return new BaseResponse<>(JwtToken);
+        return ResponseEntity.ok(memberService.signIn(loginRequestDto));
     }
 }
