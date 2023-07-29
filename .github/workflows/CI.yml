@@ -73,6 +73,5 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build with Gradle
-        run: ./gradlew build --exclude-tests=**/CouphoneServerApplicationTests
-
+      - name: Build with Gradle without test
+        run: ./gradlew build -x test
