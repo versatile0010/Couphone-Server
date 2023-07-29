@@ -33,7 +33,7 @@ spring:
 ---
 spring:
   config:
-    active:
+    activate:
       on-profile: "devDB"
 
   datasource:
@@ -62,13 +62,11 @@ spring:
       on-profile: "JPA"
 
   jpa:
-    show-sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
         format_sql: true
-
 
 ---
 
