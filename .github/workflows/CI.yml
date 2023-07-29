@@ -61,38 +61,6 @@ jobs:
         run: echo "JWT_EXPIRED_IN=${{secrets.JWT_EXPIRED_IN}}" >> application.yml
         working-directory: ./src/main/resources
 
-      - name: write CLOUDFRONT_DOMAIN at Test
-        run: echo "CLOUDFRONT_DOMAIN=${{secrets.CLOUDFRONT_DOMAIN}}" >> application.yml
-        working-directory: ./src/test/resources
-
-      - name: write DATASOURCE_PASSWORD_DEV at Test
-        run: echo "DATASOURCE_PASSWORD_DEV=${{secrets.DATASOURCE_PASSWORD_DEV}}" >> application.yml
-        working-directory: ./src/test/resources
-
-      - name: write DATASOURCE_URL_DEV at Test
-        run: echo "DATASOURCE_URL_DEV=${{secrets.DATASOURCE_URL_DEV}}" >> application.yml
-        working-directory: ./src/test/resources
-
-      - name: write DATASOURCE_USERNAME_DEV at Test
-        run: echo "DATASOURCE_USERNAME_DEV=${{secrets.DATASOURCE_USERNAME_DEV}}" >> application.yml
-        working-directory: ./src/test/resources
-
-      - name: write S3_ACCESS_KEY at Test
-        run: echo "S3_ACCESS_KEY=${{secrets.S3_ACCESS_KEY}}" >> application.yml
-        working-directory: ./src/test/resources
-
-      - name: write S3_SECRET_KEY at Test
-        run: echo "S3_SECRET_KEY=${{secrets.S3_SECRET_KEY}}" >> application.yml
-        working-directory: ./src/test/resources
-
-      - name: write JWT_SECRET_KEY at Test
-        run: echo "JWT_SECRET_KEY=${{secrets.JWT_SECRET_KEY}}" >> application.yml
-        working-directory: ./src/test/resources
-
-      - name: write JWT_EXPIRED_IN at Test
-        run: echo "JWT_EXPIRED_IN=${{secrets.JWT_EXPIRED_IN}}" >> application.yml
-        working-directory: ./src/test/resources
-
       - name: Setup MySQL
         uses: samin/mysql-action@v1
         with:
