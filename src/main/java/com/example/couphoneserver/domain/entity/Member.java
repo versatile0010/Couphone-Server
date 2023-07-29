@@ -7,7 +7,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -38,17 +37,14 @@ public class Member extends BaseTimeEntity implements UserDetails {
     @Column(name = "password")
     private String password;
     @Column(name = "grade")
-    @ColumnDefault("ROLE_MEMBER")
     @Enumerated(EnumType.STRING)
-    private MemberGrade grade = MemberGrade.ROLE_MEMBER;
+    private MemberGrade grade;
     @Column(name = "status")
-    @ColumnDefault("ACTIVE")
     @Enumerated(EnumType.STRING)
-    private MemberStatus status = MemberStatus.ACTIVE;
+    private MemberStatus status;
 
     @OneToMany(mappedBy = "member")
     private List<CouponItem> coupons = new ArrayList<>();
-
 
     @Builder
     public Member(String name, String phoneNumber, String password, String auth) {
@@ -64,7 +60,7 @@ public class Member extends BaseTimeEntity implements UserDetails {
      */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("USER"), new SimpleGrantedAuthority("ADMIN"));
+        return List.of(new SimpleGrantedAuthority("ROLE_MEMBER"), new SimpleGrantedAuthority("ROLE_ADMIN"));
     }
 
     /**
@@ -115,7 +111,15 @@ public class Member extends BaseTimeEntity implements UserDetails {
         return true; // 사용가능
     }
 
-    public void setTerminated(){
+    public void setTerminated() {
         status = MemberStatus.TERMINATED;
+    }
+
+    public void setActive() {
+        status = MemberStatus.ACTIVE;
+    }
+
+    public void setGrade(MemberGrade grade) {
+        this.grade = grade;
     }
 }
