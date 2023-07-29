@@ -1,12 +1,21 @@
 package com.example.couphoneserver.service;
 
-import com.example.couphoneserver.common.exception.MemberException;
+import com.example.couphoneserver.common.exception.member.MemberException;
+import com.example.couphoneserver.domain.MemberGrade;
 import com.example.couphoneserver.domain.entity.Member;
-import com.example.couphoneserver.dto.member.AddMemberRequest;
-import com.example.couphoneserver.dto.member.MemberInfoResponseDto;
-import com.example.couphoneserver.dto.member.MemberResponseDto;
+import com.example.couphoneserver.dto.member.request.AddMemberRequestDto;
+import com.example.couphoneserver.dto.member.request.LoginRequestDto;
+import com.example.couphoneserver.dto.member.response.LoginResponseDto;
+import com.example.couphoneserver.dto.member.response.MemberInfoResponseDto;
+import com.example.couphoneserver.dto.member.response.MemberResponseDto;
 import com.example.couphoneserver.repository.MemberRepository;
+import com.example.couphoneserver.utils.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,18 +31,22 @@ import static com.example.couphoneserver.common.response.status.BaseExceptionRes
  * 회원 관련 비지니스 로직
  */
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final JwtTokenProvider jwtProvider;
+    private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final RefreshTokenService refreshTokenService;
 
     /**
      *  휴대폰 번호로 회원 가입
      */
     @Transactional
-    public MemberResponseDto save(AddMemberRequest dto) throws UsernameNotFoundException {
+    public MemberResponseDto save(AddMemberRequestDto dto) throws UsernameNotFoundException {
         validateDuplicateMemberByPhoneNumber(dto.getPhoneNumber());
         validateDuplicateMemberByName(dto.getName());
         Member savedMember = memberRepository.save(Member.builder()
@@ -42,6 +55,8 @@ public class MemberService {
                 .password(bCryptPasswordEncoder.encode(dto.getPassword())) // bCryptPasswordEncoder.encode
                 .build()
         );
+        savedMember.setActive();
+        savedMember.setGrade(MemberGrade.ROLE_MEMBER);
         return new MemberResponseDto(savedMember);
     }
 
@@ -63,6 +78,29 @@ public class MemberService {
         member.setTerminated();
         return new MemberResponseDto(member);
     }
+
+    @Transactional
+    public LoginResponseDto signIn(LoginRequestDto loginRequestDto){
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(loginRequestDto.getPhoneNumber(), loginRequestDto.getPassword());
+        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        String accessToken = jwtProvider.generateAccessToken(authentication);
+        String refreshToken = jwtProvider.generateRefreshToken(authentication);
+
+        Member member = (Member) authentication.getPrincipal();
+
+        refreshTokenService.saveOrUpdate(member, refreshToken);
+
+        return LoginResponseDto.builder()
+                .accessToken(accessToken)
+                .tokenType("Bearer ")
+                .memberId(member.getId())
+                .grade(member.getGrade())
+                .build();
+    }
+
     /**
      * 단일 회원 정보 조회
      */
