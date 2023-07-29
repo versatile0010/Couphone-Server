@@ -30,10 +30,14 @@ public class BrandService {
         if (brandRepository.existsByName(request.getName())) {
             throw new BrandException(DUPLICATE_BRAND_NAME);
         }
+        
+        try {
+            Brand brand = request.toEntity(category);
+            brandRepository.save(brand);
 
-        Brand brand = request.toEntity(category);
-        brandRepository.save(brand);
-
-        return new PostBrandResponse(brand);
+            return new PostBrandResponse(brand);
+        } catch (Exception e) {
+            throw new DatabaseException(DATABASE_ERROR);
+        }
     }
 }
