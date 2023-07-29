@@ -67,7 +67,7 @@ jobs:
           host port: 3306
           container port: 3306
           mysql database: 'couphone-database'
-          mysql username: ${{secrets.DATASOURCE_USERNAME_DEV}}
+          mysql user: ${{secrets.DATASOURCE_USERNAME_DEV}}
           mysql password: ${{secrets.DATASOURCE_PASSWORD_DEV}}
 
       - name: Grant execute permission for gradlew
