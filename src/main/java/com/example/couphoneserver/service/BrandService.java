@@ -12,8 +12,6 @@ import com.example.couphoneserver.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 import static com.example.couphoneserver.common.response.status.BaseExceptionResponseStatus.*;
 
 @Service
@@ -30,7 +28,7 @@ public class BrandService {
         if (brandRepository.existsByName(request.getName())) {
             throw new BrandException(DUPLICATE_BRAND_NAME);
         }
-        
+
         try {
             Brand brand = request.toEntity(category);
             brandRepository.save(brand);
