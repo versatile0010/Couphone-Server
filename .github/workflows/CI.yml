@@ -14,7 +14,7 @@ on:
     branches: [ "feature/member" ]
 
 permissions:
-  contents: read
+  write-all
 
 jobs:
   build:
@@ -32,6 +32,7 @@ jobs:
       - name: write CLOUDFRONT_DOMAIN
         run: echo "CLOUDFRONT_DOMAIN=${{secrets.CLOUDFRONT_DOMAIN}}" >> application.yml
         working-directory: ./src/main/resources
+
       - name: write DATASOURCE_PASSWORD_DEV
         run: echo "DATASOURCE_PASSWORD_DEV=${{secrets.DATASOURCE_PASSWORD_DEV}}" >> application.yml
         working-directory: ./src/main/resources
