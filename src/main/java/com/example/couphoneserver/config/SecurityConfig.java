@@ -1,6 +1,7 @@
 package com.example.couphoneserver.config;
 
 import com.example.couphoneserver.service.MemberDetailService;
+import com.example.couphoneserver.utils.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,12 +14,14 @@ import org.springframework.security.config.annotation.web.configurers.FormLoginC
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private final MemberDetailService memberService;
+    private final MemberDetailService memberDetailService;
+    private final JwtTokenProvider jwtProvider;
 
     @Bean
     public WebSecurityCustomizer configure() {
@@ -33,7 +36,8 @@ public class SecurityConfig {
                 .formLogin(FormLoginConfigurer::disable)
                 .sessionManagement(httpSecuritySessionManagementConfigurer ->
                         httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                );
+                )
+                .addFilterBefore(new TokenAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
@@ -42,7 +46,7 @@ public class SecurityConfig {
     public DaoAuthenticationProvider daoAuthenticationProvider() throws Exception {
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
 
-        daoAuthenticationProvider.setUserDetailsService(memberService);
+        daoAuthenticationProvider.setUserDetailsService(memberDetailService);
         daoAuthenticationProvider.setPasswordEncoder(bCryptPasswordEncoder());
 
         return daoAuthenticationProvider;
