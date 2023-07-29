@@ -3,9 +3,9 @@ package com.example.couphoneserver.controller;
 import com.example.couphoneserver.common.annotation.NoAuth;
 import com.example.couphoneserver.common.response.BaseResponse;
 import com.example.couphoneserver.domain.entity.Member;
-import com.example.couphoneserver.dto.member.AddMemberRequest;
-import com.example.couphoneserver.dto.member.MemberInfoResponseDto;
-import com.example.couphoneserver.dto.member.MemberResponseDto;
+import com.example.couphoneserver.dto.member.request.AddMemberRequestDto;
+import com.example.couphoneserver.dto.member.response.MemberInfoResponseDto;
+import com.example.couphoneserver.dto.member.response.MemberResponseDto;
 import com.example.couphoneserver.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,7 +25,7 @@ public class MemberController {
     @NoAuth
     @PostMapping
     @Operation(summary = "휴대폰 번호로 회원 가입", description = "request = {이름, 휴대폰 번호, 비밀번호}")
-    public BaseResponse<MemberResponseDto> signup(@Valid @RequestBody AddMemberRequest request) {
+    public BaseResponse<MemberResponseDto> signup(@Valid @RequestBody AddMemberRequestDto request) {
         return new BaseResponse<>(memberService.save(request));
     }
 

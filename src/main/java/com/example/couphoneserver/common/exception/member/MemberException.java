@@ -1,4 +1,4 @@
-package com.example.couphoneserver.common.exception;
+package com.example.couphoneserver.common.exception.member;
 
 import com.example.couphoneserver.common.response.status.ResponseStatus;
 import lombok.Getter;
