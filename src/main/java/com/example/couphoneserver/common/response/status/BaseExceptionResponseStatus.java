@@ -40,6 +40,12 @@ public enum BaseExceptionResponseStatus implements ResponseStatus {
     TOKEN_MISMATCH(4006, HttpStatus.UNAUTHORIZED.value(), "로그인 정보가 토큰 정보와 일치하지 않습니다."),
 
     /**
+     *  5000: Member 오류
+     */
+    DUPLICATED_MEMBER_EXCEPTION(5000, HttpStatus.BAD_REQUEST.value(), "중복된 회원 값 입니다."),
+    MEMBER_NOT_FOUND(5001, HttpStatus.BAD_REQUEST.value(), "회원을 찾을 수 없습니다."),
+
+    /**
      * 6000: 카테고리 오류
      */
     CATEGORY_NOT_FOUND(6000, HttpStatus.BAD_REQUEST.value(), "카테고리가 존재하지 않습니다."),

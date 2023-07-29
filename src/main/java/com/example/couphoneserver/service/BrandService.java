@@ -3,6 +3,7 @@ package com.example.couphoneserver.service;
 import com.example.couphoneserver.common.exception.BrandException;
 import com.example.couphoneserver.common.exception.CategoryException;
 import com.example.couphoneserver.common.exception.DatabaseException;
+import com.example.couphoneserver.common.exception.MemberException;
 import com.example.couphoneserver.domain.CouponItemStatus;
 import com.example.couphoneserver.domain.entity.Brand;
 import com.example.couphoneserver.domain.entity.Category;
@@ -13,8 +14,8 @@ import com.example.couphoneserver.dto.brand.PostBrandResponse;
 import com.example.couphoneserver.repository.BrandRepository;
 import com.example.couphoneserver.repository.CategoryRepository;
 import com.example.couphoneserver.repository.CouponItemRepository;
+import com.example.couphoneserver.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ public class BrandService {
     private final BrandRepository brandRepository;
     private final CategoryRepository categoryRepository;
     private final CouponItemRepository couponItemRepository;
+    private final MemberRepository memberRepository;
 
     public PostBrandResponse saveBrand(PostBrandRequest request) {
         // 카테고리 존재하는지 검사
@@ -51,6 +53,10 @@ public class BrandService {
 
     public List<GetBrandResponse> findByCategoryId(Long mid, Long cid) {
         List<GetBrandResponse> brandList = new ArrayList<>();
+
+        // 멤버 존재하는지 검사
+        memberRepository.findById(mid)
+                        .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
 
         // 카테고리 존재하는지 검사
         categoryRepository.findById(cid)
