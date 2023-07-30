@@ -29,6 +29,14 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
+      - name: Check main Config
+        run: cat application.yml
+        working-directory: ./src/main/resources
+
+      - name: Check test Config
+        run: cat application.yml
+        working-directory: ./src/test/resources
+
       - name: write CLOUDFRONT_DOMAIN at Main
         run: echo "CLOUDFRONT_DOMAIN=${{secrets.CLOUDFRONT_DOMAIN}}" >> application.yml
         working-directory: ./src/main/resources
