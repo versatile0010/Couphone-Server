@@ -1,5 +1,9 @@
 package com.example.couphoneserver.dto.coupon;
 
+import com.example.couphoneserver.domain.CouponItemStatus;
+import com.example.couphoneserver.domain.entity.Brand;
+import com.example.couphoneserver.domain.entity.CouponItem;
+import com.example.couphoneserver.domain.entity.Member;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -16,4 +20,12 @@ public class PostCouponRequest {
     @Schema(description = "브랜드 ID", example = "1")
     Long brandId;
 
+    public CouponItem toEntity(Member member, Brand brand) {
+        return CouponItem.builder()
+                .member(member)
+                .brand(brand)
+                .stampCount(0)
+                .status(CouponItemStatus.ACTIVE)
+                .build();
+    }
 }

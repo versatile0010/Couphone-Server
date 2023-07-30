@@ -2,16 +2,15 @@ package com.example.couphoneserver.domain.entity;
 
 import com.example.couphoneserver.domain.CouponItemStatus;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "COUPON_ITEM")
 @Entity
+@Builder
+@AllArgsConstructor
 public class CouponItem extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
