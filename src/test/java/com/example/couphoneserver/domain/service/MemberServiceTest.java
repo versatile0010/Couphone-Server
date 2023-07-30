@@ -1,13 +1,22 @@
 package com.example.couphoneserver.domain.service;
 
+import com.example.couphoneserver.common.exception.member.MemberException;
+import com.example.couphoneserver.domain.MemberStatus;
 import com.example.couphoneserver.domain.entity.Member;
+import com.example.couphoneserver.dto.member.request.AddMemberRequestDto;
+import com.example.couphoneserver.dto.member.request.LoginRequestDto;
+import com.example.couphoneserver.dto.member.response.LoginResponseDto;
+import com.example.couphoneserver.dto.member.response.MemberResponseDto;
+import com.example.couphoneserver.repository.BrandRepository;
 import com.example.couphoneserver.repository.MemberRepository;
+import com.example.couphoneserver.repository.StoreRepository;
 import com.example.couphoneserver.service.MemberService;
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -17,8 +26,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("dev")
 @RunWith(SpringRunner.class)
@@ -29,6 +37,12 @@ public class MemberServiceTest {
     MemberService memberService;
     @Autowired
     MemberRepository memberRepository;
+    @Autowired
+    BrandRepository brandRepository;
+    @Autowired
+    StoreRepository storeRepository;
+    @Autowired
+    BCryptPasswordEncoder passwordEncoder;
 
     @BeforeEach
     public void cleanUp() {
@@ -55,7 +69,7 @@ public class MemberServiceTest {
 
     @Rollback
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = MemberException.class)
     public void 회원_중복이름_가입시도하면_예외처리() throws Exception {
         // given
         Member memberKim1 = Member.builder()
@@ -75,7 +89,7 @@ public class MemberServiceTest {
                 .build();
         memberService.join(memberKim1);
         // when
-        // 같은 이름을 가진 회원 가입 시도 시 IllegalStateException error
+        // 같은 이름을 가진 회원 가입 시도 시 MemberException error
         memberService.join(memberKim2);
         memberService.join(memberLee); // 이름이 중복되지 않으므로 가입 되어야 함.
 
@@ -145,7 +159,7 @@ public class MemberServiceTest {
         assertThat(findMember3).isEqualTo(member3);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = MemberException.class)
     public void 회원_유효하지_않은_id로_조회하면_예외처리() throws Exception {
         // given
         Member member = Member.builder()
@@ -170,12 +184,34 @@ public class MemberServiceTest {
                 .build();
         // when
         memberService.join(member);
+
         Member findMember = memberService.findOneById(member.getId());
 
-        // System.out.println("createdDate = " + member.getCreatedDate());
-        // System.out.println("modifiedDate = " + member.getModifiedDate());
+        //System.out.println("createdDate = " + member.getCreatedDate());
+        //System.out.println("modifiedDate = " + member.getModifiedDate());
         // then
         assertThat(member.getCreatedDate()).isAfter(now);
         assertThat(member.getModifiedDate()).isAfter(now);
+    }
+
+    @Test
+    public void 회원_로그인_요청_토큰_발급_및_상태_ACTIVE() throws Exception {
+        // given
+        String phoneNumber = "010-1111-2222";
+        String password = "12345678";
+        String name = "김테스트";
+        String encodedPassword = passwordEncoder.encode(password);
+        AddMemberRequestDto addMemberRequestDto = new AddMemberRequestDto(name, phoneNumber, password);
+        MemberResponseDto memberResponseDto = memberService.save(addMemberRequestDto);
+        // when
+        LoginRequestDto loginRequest = new LoginRequestDto(phoneNumber, password);
+        LoginResponseDto loginResponse = memberService.signIn(loginRequest);
+
+        Member member = memberService.findOneById(memberResponseDto.getId());
+        // then
+        assertAll(
+                () -> assertThat(member.getStatus()).isEqualTo(MemberStatus.ACTIVE),
+                () -> assertNotNull(loginResponse.getAccessToken())
+        );
     }
 }

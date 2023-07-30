@@ -2,6 +2,7 @@ package com.example.couphoneserver.service;
 
 import com.example.couphoneserver.common.exception.member.MemberException;
 import com.example.couphoneserver.domain.MemberGrade;
+import com.example.couphoneserver.domain.MemberStatus;
 import com.example.couphoneserver.domain.entity.Member;
 import com.example.couphoneserver.dto.member.request.AddMemberRequestDto;
 import com.example.couphoneserver.dto.member.request.LoginRequestDto;
@@ -49,17 +50,21 @@ public class MemberService {
     public MemberResponseDto save(AddMemberRequestDto dto) throws UsernameNotFoundException {
         validateDuplicateMemberByPhoneNumber(dto.getPhoneNumber());
         validateDuplicateMemberByName(dto.getName());
-        Member savedMember = memberRepository.save(Member.builder()
-                .name(dto.getName())
-                .phoneNumber(dto.getPhoneNumber())
-                .password(bCryptPasswordEncoder.encode(dto.getPassword())) // bCryptPasswordEncoder.encode
-                .build()
+        Member savedMember = memberRepository.save(
+                new Member(dto.getName(), dto.getPhoneNumber(), bCryptPasswordEncoder.encode(dto.getPassword()),
+                        MemberStatus.ACTIVE, MemberGrade.ROLE_MEMBER)
         );
-        savedMember.setActive();
-        savedMember.setGrade(MemberGrade.ROLE_MEMBER);
         return new MemberResponseDto(savedMember);
     }
 
+    @Transactional
+    public void setActive(Member member){
+        member.setActive();
+    }
+    @Transactional
+    public void setGrade(Member member, MemberGrade grade){
+        member.setGrade(grade);
+    }
     /**
      * 회원 가입
      */

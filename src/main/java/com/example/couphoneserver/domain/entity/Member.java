@@ -53,6 +53,14 @@ public class Member extends BaseTimeEntity implements UserDetails {
         this.password = password;
     }
 
+    public Member(String name, String phoneNumber, String password, MemberStatus status, MemberGrade grade) {
+        this.name = name;
+        this.phoneNumber = phoneNumber;
+        this.password = password;
+        this.status = status;
+        this.grade = grade;
+    }
+
     // [Spring Security] 사용자 인증 정보 접근
 
     /**
@@ -116,7 +124,7 @@ public class Member extends BaseTimeEntity implements UserDetails {
     }
 
     public void setActive() {
-        status = MemberStatus.ACTIVE;
+        this.status = MemberStatus.ACTIVE;
     }
 
     public void setGrade(MemberGrade grade) {
