@@ -24,7 +24,7 @@ public class PostCouponRequest {
         return CouponItem.builder()
                 .member(member)
                 .brand(brand)
-                .stampCount(0)
+                .stampCount(1)
                 .status(CouponItemStatus.ACTIVE)
                 .build();
     }

@@ -1,7 +1,6 @@
 package com.example.couphoneserver.controller;
 
 import com.example.couphoneserver.common.exception.BadRequestException;
-import com.example.couphoneserver.common.response.BaseErrorResponse;
 import com.example.couphoneserver.common.response.BaseResponse;
 import com.example.couphoneserver.dto.brand.GetBrandResponse;
 import com.example.couphoneserver.dto.brand.PostBrandRequest;

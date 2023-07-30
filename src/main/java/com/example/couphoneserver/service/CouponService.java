@@ -1,19 +1,14 @@
 package com.example.couphoneserver.service;
 
 import com.example.couphoneserver.common.exception.BrandException;
-import com.example.couphoneserver.common.exception.CategoryException;
 import com.example.couphoneserver.common.exception.DatabaseException;
 import com.example.couphoneserver.common.exception.MemberException;
 import com.example.couphoneserver.domain.entity.Brand;
-import com.example.couphoneserver.domain.entity.Category;
 import com.example.couphoneserver.domain.entity.CouponItem;
 import com.example.couphoneserver.domain.entity.Member;
-import com.example.couphoneserver.dto.brand.PostBrandRequest;
-import com.example.couphoneserver.dto.brand.PostBrandResponse;
 import com.example.couphoneserver.dto.coupon.PostCouponRequest;
 import com.example.couphoneserver.dto.coupon.PostCouponResponse;
 import com.example.couphoneserver.repository.BrandRepository;
-import com.example.couphoneserver.repository.CategoryRepository;
 import com.example.couphoneserver.repository.CouponItemRepository;
 import com.example.couphoneserver.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +22,6 @@ import static com.example.couphoneserver.common.response.status.BaseExceptionRes
  */
 
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class CouponService {
 
