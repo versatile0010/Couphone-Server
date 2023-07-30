@@ -73,5 +73,5 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build with Gradle without test
-        run: ./gradlew build --exclude-task test
+      - name: Build with Gradle
+        run: ./gradlew build

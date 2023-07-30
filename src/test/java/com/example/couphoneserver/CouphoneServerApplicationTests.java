@@ -11,6 +11,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest
 class CouphoneServerApplicationTests {
 
+	static {
+		System.setProperty("com.amazonaws.sdk.disableEc2Metadata", "true");
+	}
 	@Test
 	void contextLoads() {
 	}
