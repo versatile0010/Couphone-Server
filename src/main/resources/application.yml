@@ -43,6 +43,7 @@ spring:
   sql:
     init:
       platform: mysql
+      mode: always
 
 ---
 spring:
