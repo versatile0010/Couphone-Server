@@ -1,5 +1,6 @@
 package com.example.couphoneserver.utils.jwt;
 
+import com.example.couphoneserver.common.exception.jwt.bad_request.JwtNoTokenException;
 import com.example.couphoneserver.common.exception.jwt.bad_request.JwtUnsupportedTokenException;
 import com.example.couphoneserver.common.exception.jwt.unauthorized.JwtInvalidTokenException;
 import com.example.couphoneserver.common.exception.jwt.unauthorized.JwtMalformedTokenException;
@@ -83,12 +84,6 @@ public class JwtTokenProvider implements InitializingBean {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-
-        /*
-        Collection<? extends GrantedAuthority> authorities =
-                Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
-                        .map(SimpleGrantedAuthority::new)
-                        .toList();*/
         Collection<? extends GrantedAuthority> authorities = Arrays.asList(new SimpleGrantedAuthority("ROLE_MEMBER"), new SimpleGrantedAuthority("ROLE_ADMIN"));
 
         User principal = new User(claims.getSubject(), "", authorities);
@@ -98,7 +93,7 @@ public class JwtTokenProvider implements InitializingBean {
     @Transactional(readOnly = true)
     public String getRefreshToken(Long userId) {
         RefreshToken refreshToken = refreshTokenRepository.findByMemberId(userId)
-                .orElseThrow(() -> new IllegalArgumentException("refresh token 이 존재하지 않습니다."));
+                .orElseThrow(() -> new JwtNoTokenException(JWT_ERROR));
         return refreshToken.getRefreshToken();
     }
 
