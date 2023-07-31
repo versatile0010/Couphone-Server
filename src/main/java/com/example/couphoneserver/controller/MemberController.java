@@ -24,22 +24,25 @@ public class MemberController {
 
     @NoAuth
     @PostMapping
-    @Operation(summary = "휴대폰 번호로 회원 가입", description = "request = {이름, 휴대폰 번호, 비밀번호}")
+    @Operation(summary = "휴대폰 번호로 회원 가입", description =
+            "Request Body 에 휴대폰 번호, 비밀번호를 담아서 보내주세요! 비밀번호는 DB 에 암호화되어 관리합니다.")
     public BaseResponse<MemberResponseDto> signup(@Valid @RequestBody AddMemberRequestDto request) {
         return new BaseResponse<>(memberService.save(request));
     }
 
-    @PatchMapping("/{id}")
-    @Operation(summary = "회원 탈퇴", description = "회원의 상태를 TERMINATED 로 변경합니다.")
-    public BaseResponse<MemberResponseDto> delete(@PathVariable Long id){
-        Member member = memberService.findOneById(id);
+    @PatchMapping("/{member-id}")
+    @Operation(summary = "회원 탈퇴", description =
+            "회원의 상태를 TERMINATED 으로 변경합니다. path variable 로 멤버 id 담아서 보내주세요!")
+    public BaseResponse<MemberResponseDto> delete(@PathVariable("member-id") Long memberId){
+        Member member = memberService.findOneById(memberId);
         return new BaseResponse<>(memberService.delete(member));
     }
 
-    @GetMapping("/{id}")
-    @Operation(summary = "회원 정보 조회", description = "회원의 정보를 조회합니다.")
-    public BaseResponse<MemberInfoResponseDto> show(@PathVariable Long id){
-        Member member = memberService.findOneById(id);
+    @GetMapping("/{member-id}")
+    @Operation(summary = "회원 정보 조회", description =
+            "회원 정보를 조회합니다. path variable 로 멤버 id 담아서 보내주세요!")
+    public BaseResponse<MemberInfoResponseDto> show(@PathVariable("member-id") Long memberId){
+        Member member = memberService.findOneById(memberId);
         return new BaseResponse<>(memberService.getMemberInfo(member));
     }
 }
