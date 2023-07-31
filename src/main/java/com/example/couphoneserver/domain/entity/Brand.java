@@ -31,7 +31,7 @@ public class Brand extends BaseTimeEntity {
     @OneToMany(mappedBy = "brand")
     private List<Store> stores = new ArrayList<>(); // 해당 브랜드의 매장들
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
 }
