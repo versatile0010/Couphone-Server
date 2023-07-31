@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 public class PostBrandResponse {
 
-    @Schema(example = "1")
+    @Schema(description = "브랜드 ID", example = "1")
     private Long id;
 
     public PostBrandResponse(Brand brand) {

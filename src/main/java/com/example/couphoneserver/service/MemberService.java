@@ -1,10 +1,22 @@
 package com.example.couphoneserver.service;
 
+import com.example.couphoneserver.common.exception.MemberException;
+import com.example.couphoneserver.domain.MemberGrade;
+import com.example.couphoneserver.domain.MemberStatus;
 import com.example.couphoneserver.domain.entity.Member;
-import com.example.couphoneserver.dto.member.AddMemberRequest;
-import com.example.couphoneserver.dto.member.AddMemberResponse;
+import com.example.couphoneserver.dto.member.request.AddMemberRequestDto;
+import com.example.couphoneserver.dto.member.request.LoginRequestDto;
+import com.example.couphoneserver.dto.member.response.LoginResponseDto;
+import com.example.couphoneserver.dto.member.response.MemberInfoResponseDto;
+import com.example.couphoneserver.dto.member.response.MemberResponseDto;
 import com.example.couphoneserver.repository.MemberRepository;
+import com.example.couphoneserver.utils.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -13,33 +25,46 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+import static com.example.couphoneserver.common.response.status.BaseExceptionResponseStatus.DUPLICATED_MEMBER_EXCEPTION;
+import static com.example.couphoneserver.common.response.status.BaseExceptionResponseStatus.MEMBER_NOT_FOUND;
+
 /**
  * 회원 관련 비지니스 로직
  */
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final JwtTokenProvider jwtProvider;
+    private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final RefreshTokenService refreshTokenService;
 
     /**
      *  휴대폰 번호로 회원 가입
      */
     @Transactional
-    public AddMemberResponse save(AddMemberRequest dto) throws UsernameNotFoundException {
+    public MemberResponseDto save(AddMemberRequestDto dto) throws UsernameNotFoundException {
         validateDuplicateMemberByPhoneNumber(dto.getPhoneNumber());
         validateDuplicateMemberByName(dto.getName());
-        Member savedMember = memberRepository.save(Member.builder()
-                .name(dto.getName())
-                .phoneNumber(dto.getPhoneNumber())
-                .password(bCryptPasswordEncoder.encode(dto.getPassword())) // bCryptPasswordEncoder.encode
-                .build()
+        Member savedMember = memberRepository.save(
+                new Member(dto.getName(), dto.getPhoneNumber(), bCryptPasswordEncoder.encode(dto.getPassword()),
+                        MemberStatus.ACTIVE, MemberGrade.ROLE_MEMBER)
         );
-        return new AddMemberResponse(savedMember);
+        return new MemberResponseDto(savedMember);
     }
 
+    @Transactional
+    public void setActive(Member member){
+        member.setActive();
+    }
+    @Transactional
+    public void setGrade(Member member, MemberGrade grade){
+        member.setGrade(grade);
+    }
     /**
      * 회원 가입
      */
@@ -51,12 +76,50 @@ public class MemberService {
     }
 
     /**
+     * 회원 탈퇴 처리
+     */
+    @Transactional
+    public MemberResponseDto delete(Member member){
+        member.setTerminated();
+        return new MemberResponseDto(member);
+    }
+
+    @Transactional
+    public LoginResponseDto signIn(LoginRequestDto loginRequestDto){
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(loginRequestDto.getPhoneNumber(), loginRequestDto.getPassword());
+        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        String accessToken = jwtProvider.generateAccessToken(authentication);
+        String refreshToken = jwtProvider.generateRefreshToken(authentication);
+
+        Member member = (Member) authentication.getPrincipal();
+
+        refreshTokenService.saveOrUpdate(member, refreshToken);
+
+        return LoginResponseDto.builder()
+                .accessToken(accessToken)
+                .tokenType("Bearer ")
+                .memberId(member.getId())
+                .grade(member.getGrade())
+                .build();
+    }
+
+    /**
+     * 단일 회원 정보 조회
+     */
+    public MemberInfoResponseDto getMemberInfo(Member member){
+        return new MemberInfoResponseDto(member);
+    }
+
+    /**
      * 이름 중복 검증
      */
     private void validateDuplicateMemberByName(String name) {
         List<Member> findMembers = memberRepository.findByName(name);
         if (!findMembers.isEmpty()) {
-            throw new IllegalStateException("  이미 존재하는 회원입니다.  ");
+            throw new MemberException(DUPLICATED_MEMBER_EXCEPTION);
         }
     }
 
@@ -72,7 +135,7 @@ public class MemberService {
      */
     public Member findOneById(Long memberId) {
         return memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("  주어진 id 와 매칭하는 회원을 찾을 수 없습니다.  "));
+                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
     }
 
     /**
@@ -81,7 +144,7 @@ public class MemberService {
     private void validateDuplicateMemberByPhoneNumber(String phoneNumber) {
         Optional<Member> optionalUser = memberRepository.findByPhoneNumber(phoneNumber);
         optionalUser.ifPresent(findUser -> {
-            throw new IllegalArgumentException(" 휴대폰 번호가 중복입니다! ");
+            throw new MemberException(DUPLICATED_MEMBER_EXCEPTION);
         });
     }
     /**
