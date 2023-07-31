@@ -39,11 +39,12 @@ public class CouponItem extends BaseTimeEntity {
     public void collectStamp() {
         int requiredStampCount = 10; // 필요한 쿠폰 개수
         int currentStampCount = this.stampCount;
+        this.stampCount = currentStampCount + 1;
+
         if (currentStampCount + 1 == requiredStampCount) {
             this.status = CouponItemStatus.ACTIVE;
-            return;
         }
-        this.stampCount = currentStampCount + 1;
+
     }
 
     /**
