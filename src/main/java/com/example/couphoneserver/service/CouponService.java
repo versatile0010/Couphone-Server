@@ -3,6 +3,7 @@ package com.example.couphoneserver.service;
 import com.example.couphoneserver.common.exception.BrandException;
 import com.example.couphoneserver.common.exception.DatabaseException;
 import com.example.couphoneserver.common.exception.MemberException;
+import com.example.couphoneserver.domain.CouponItemStatus;
 import com.example.couphoneserver.domain.entity.Brand;
 import com.example.couphoneserver.domain.entity.CouponItem;
 import com.example.couphoneserver.domain.entity.Member;
