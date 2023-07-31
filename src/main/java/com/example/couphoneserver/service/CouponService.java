@@ -49,7 +49,7 @@ public class CouponService {
         }
     }
 
-    public PatchCouponCountResponse patchCouponCount(PatchCouponCountRequest request) {
+    public PatchCouponCountResponse collectStamp(PatchCouponCountRequest request) {
         // 멤버 존재하는지 검사
         findMemberById(request.getMemberId());
 
