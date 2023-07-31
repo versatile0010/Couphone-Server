@@ -7,7 +7,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -38,23 +37,28 @@ public class Member extends BaseTimeEntity implements UserDetails {
     @Column(name = "password")
     private String password;
     @Column(name = "grade")
-    @ColumnDefault("ROLE_MEMBER")
     @Enumerated(EnumType.STRING)
-    private MemberGrade grade = MemberGrade.ROLE_MEMBER;
+    private MemberGrade grade;
     @Column(name = "status")
-    @ColumnDefault("ACTIVE")
     @Enumerated(EnumType.STRING)
-    private MemberStatus status = MemberStatus.ACTIVE;
+    private MemberStatus status;
 
     @OneToMany(mappedBy = "member")
     private List<CouponItem> coupons = new ArrayList<>();
-
 
     @Builder
     public Member(String name, String phoneNumber, String password, String auth) {
         this.name = name;
         this.phoneNumber = phoneNumber;
         this.password = password;
+    }
+
+    public Member(String name, String phoneNumber, String password, MemberStatus status, MemberGrade grade) {
+        this.name = name;
+        this.phoneNumber = phoneNumber;
+        this.password = password;
+        this.status = status;
+        this.grade = grade;
     }
 
     // [Spring Security] 사용자 인증 정보 접근
@@ -64,7 +68,7 @@ public class Member extends BaseTimeEntity implements UserDetails {
      */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("USER"), new SimpleGrantedAuthority("ADMIN"));
+        return List.of(new SimpleGrantedAuthority("ROLE_MEMBER"), new SimpleGrantedAuthority("ROLE_ADMIN"));
     }
 
     /**
@@ -113,5 +117,17 @@ public class Member extends BaseTimeEntity implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true; // 사용가능
+    }
+
+    public void setTerminated() {
+        status = MemberStatus.TERMINATED;
+    }
+
+    public void setActive() {
+        this.status = MemberStatus.ACTIVE;
+    }
+
+    public void setGrade(MemberGrade grade) {
+        this.grade = grade;
     }
 }
