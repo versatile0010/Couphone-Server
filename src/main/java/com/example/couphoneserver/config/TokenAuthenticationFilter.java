@@ -15,9 +15,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-/**
- * access token 이 담긴 authorization header 값을 가져온 뒤 유효하다면 인증 정보를 설정함
- */
 @Slf4j
 @RequiredArgsConstructor
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
@@ -25,10 +22,17 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     private final static String HEADER_AUTHORIZATION = "Authorization";
     private final static String TOKEN_PREFIX = "Bearer ";
 
+    /**
+     *  1. request header Authorization 내 Token 유효성 검사
+     *  2. 유효하면 인증 정보를 security context 에 저장
+     *  3. Token 기간 만료 시 userId 를 header 에서 가져옴
+     *  4. userId 로 refresh token 을 조회한 뒤 유효성 검사이후 유효기간 전이라면 access 재발급
+     */ 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String accessToken = resolveToken(request, HEADER_AUTHORIZATION);
         // access token 검증
+        // TODO: 검증 로직 보완 예정
         if (StringUtils.hasText(accessToken) && !jwtProvider.isExpiredToken(accessToken)) {
             Authentication authentication = jwtProvider.getAuthentication(accessToken);
             SecurityContextHolder.getContext().setAuthentication(authentication); // security context 에 인증 정보 저장
