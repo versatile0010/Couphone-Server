@@ -6,4 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CouponItemRepository extends JpaRepository<CouponItem, Long> {
     CouponItem findByMemberIdAndBrandIdAndStatus(Long mid, Long bid, CouponItemStatus status);
+    CouponItem findByMemberIdAndBrandId(Long mid, Long bid);
 }

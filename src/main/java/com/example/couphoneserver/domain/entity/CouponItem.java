@@ -2,16 +2,15 @@ package com.example.couphoneserver.domain.entity;
 
 import com.example.couphoneserver.domain.CouponItemStatus;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "COUPON_ITEM")
 @Entity
+@Builder
+@AllArgsConstructor
 public class CouponItem extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,11 +39,12 @@ public class CouponItem extends BaseTimeEntity {
     public void collectStamp() {
         int requiredStampCount = 10; // 필요한 쿠폰 개수
         int currentStampCount = this.stampCount;
+        this.stampCount = currentStampCount + 1;
+
         if (currentStampCount + 1 == requiredStampCount) {
             this.status = CouponItemStatus.ACTIVE;
-            return;
         }
-        this.stampCount = currentStampCount + 1;
+
     }
 
     /**
