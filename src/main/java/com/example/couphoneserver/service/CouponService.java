@@ -6,6 +6,8 @@ import com.example.couphoneserver.common.exception.MemberException;
 import com.example.couphoneserver.domain.entity.Brand;
 import com.example.couphoneserver.domain.entity.CouponItem;
 import com.example.couphoneserver.domain.entity.Member;
+import com.example.couphoneserver.dto.coupon.PatchCouponCountRequest;
+import com.example.couphoneserver.dto.coupon.PatchCouponCountResponse;
 import com.example.couphoneserver.dto.coupon.PostCouponRequest;
 import com.example.couphoneserver.dto.coupon.PostCouponResponse;
 import com.example.couphoneserver.repository.BrandRepository;
@@ -30,12 +32,10 @@ public class CouponService {
 
     public PostCouponResponse saveCoupon(PostCouponRequest request) {
         // 멤버 존재하는지 검사
-        Member member = memberRepository.findById(request.getMemberId())
-                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
+        Member member = findMemberById(request.getMemberId());
 
         // 브랜드 존재하는지 검사
-        Brand brand = brandRepository.findById(request.getBrandId())
-                .orElseThrow(() -> new BrandException(BRAND_NOT_FOUND));
+        Brand brand = findBrandById(request.getBrandId());
 
         try {
             CouponItem couponItem = request.toEntity(member, brand);
@@ -47,4 +47,13 @@ public class CouponService {
         }
     }
 
+    private Member findMemberById(Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
+    }
+
+    private Brand findBrandById(Long brandId) {
+        return brandRepository.findById(brandId)
+                .orElseThrow(() -> new BrandException(BRAND_NOT_FOUND));
+    }
 }
