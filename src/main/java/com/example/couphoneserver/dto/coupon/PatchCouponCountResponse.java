@@ -4,19 +4,17 @@ import com.example.couphoneserver.domain.entity.CouponItem;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
-
 @Getter
-public class PostCouponResponse {
+public class PatchCouponCountResponse {
 
     @Schema(description = "쿠폰 ID", example = "1")
     Long couponId;
 
-    @Schema(description = "쿠폰 생성 날짜", example = "2023-07-29 18:35:46.434060")
-    LocalDateTime createdDate;
+    @Schema(description = "스탬프 적립 개수", example = "3")
+    int stampCount;
 
-    public PostCouponResponse(CouponItem couponItem) {
+    public PatchCouponCountResponse(CouponItem couponItem) {
         couponId = couponItem.getId();
-        createdDate = couponItem.getCreatedDate();
+        stampCount = couponItem.getStampCount();
     }
 }
