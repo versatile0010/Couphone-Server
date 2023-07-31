@@ -57,11 +57,16 @@ public class CouponService {
         findBrandById(request.getBrandId());
 
         // 쿠폰 찾기
-        CouponItem couponItem = couponItemRepository.findByMemberIdAndBrandIdAndStatus(request.getMemberId(), request.getBrandId(), CouponItemStatus.ACTIVE);
+        CouponItem couponItem = couponItemRepository.findByMemberIdAndBrandId(request.getMemberId(), request.getBrandId());
 
         // 해당 쿠폰이 존재하지 않는 경우
         if (couponItem == null) {
             throw new CouponException(COUPON_NOT_FOUND);
+        }
+
+        // 해당 쿠폰을 적립할 수 없는 상태일 경우
+        if (couponItem.getStatus() != CouponItemStatus.INACTIVE) {
+            throw new CouponException(COUPON_NOT_COLLECT);
         }
 
         // 쿠폰 스탬프 추가
