@@ -28,9 +28,6 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String accessToken = resolveToken(request, HEADER_AUTHORIZATION);
-        log.info("[doFilterInternal]");
-        log.info(accessToken);
-
         // access token 검증
         if (StringUtils.hasText(accessToken) && !jwtProvider.isExpiredToken(accessToken)) {
             Authentication authentication = jwtProvider.getAuthentication(accessToken);
@@ -38,7 +35,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             log.info("Access Token 은 아직 유효합니다.");
         } else if (StringUtils.hasText(accessToken) && jwtProvider.isExpiredToken(accessToken)) {
             // 재발급해야함
-            log.info("Access Token 이 Expired 되었습니다!");
+            log.info("Authorization 필드에 담겨진 Access Token 이 Expired 되었습니다!");
             String refreshToken = null;
 
             if (StringUtils.hasText(request.getHeader("Auth"))) { // Auth 에는 userId가 담겨서 와야함!
@@ -55,8 +52,6 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
                 response.setHeader(HttpHeaders.AUTHORIZATION, newAccessToken);
                 log.info("Access token 을 재발급합니다.");
-                log.info("[refreshToken] ");
-                log.warn(newAccessToken);
             }
         }
         filterChain.doFilter(request, response);
