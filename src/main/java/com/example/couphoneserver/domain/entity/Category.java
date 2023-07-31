@@ -5,6 +5,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -15,6 +18,6 @@ public class Category extends BaseTimeEntity {
     @Column(name = "category_id")
     private Long id;
     String name;
-    @OneToOne(mappedBy = "category", fetch = FetchType.LAZY)
-    private Brand brand;
+    @OneToMany(mappedBy = "category")
+    private List<Brand> brands = new ArrayList<>();
 }
