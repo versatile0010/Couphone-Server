@@ -4,15 +4,15 @@ import com.example.couphoneserver.common.response.status.ResponseStatus;
 import lombok.Getter;
 
 @Getter
-public class MemberException extends RuntimeException {
+public class CategoryException extends RuntimeException {
     private final ResponseStatus exceptionStatus;
 
-    public MemberException(ResponseStatus exceptionStatus) {
+    public CategoryException(ResponseStatus exceptionStatus) {
         super(exceptionStatus.getMessage());
         this.exceptionStatus = exceptionStatus;
     }
 
-    public MemberException(ResponseStatus exceptionStatus, String message) {
+    public CategoryException(ResponseStatus exceptionStatus, String message) {
         super(message);
         this.exceptionStatus = exceptionStatus;
     }

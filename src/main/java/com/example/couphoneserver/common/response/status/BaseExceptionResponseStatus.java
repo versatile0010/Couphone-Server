@@ -43,8 +43,18 @@ public enum BaseExceptionResponseStatus implements ResponseStatus {
      *  5000: Member 오류
      */
     DUPLICATED_MEMBER_EXCEPTION(5000, HttpStatus.BAD_REQUEST.value(), "중복된 회원 값 입니다."),
-    MEMBER_NOT_FOUND(5001, HttpStatus.BAD_REQUEST.value(), "회원을 찾을 수 없습니다.");
+    MEMBER_NOT_FOUND(5001, HttpStatus.BAD_REQUEST.value(), "회원을 찾을 수 없습니다."),
 
+    /**
+     * 6000: 카테고리 오류
+     */
+    CATEGORY_NOT_FOUND(6000, HttpStatus.BAD_REQUEST.value(), "카테고리가 존재하지 않습니다."),
+
+    /**
+     * 7000: 브랜드 오류
+     */
+    BRAND_NOT_FOUND(7000, HttpStatus.BAD_REQUEST.value(), "브랜드가 존재하지 않습니다."),
+    DUPLICATE_BRAND_NAME(7001, HttpStatus.BAD_REQUEST.value(), "중복된 브랜드 이름이 존재합니다.");
 
     private final int code;
     private final int status;
