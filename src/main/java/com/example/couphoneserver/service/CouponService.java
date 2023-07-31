@@ -66,6 +66,9 @@ public class CouponService {
 
         // 쿠폰 스탬프 추가
         couponItem.collectStamp();
+        couponItemRepository.save(couponItem);
+
+        // 예외 처리,,, 해야 함
 
         return new PatchCouponCountResponse(couponItem);
     }
