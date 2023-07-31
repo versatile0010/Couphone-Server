@@ -1,6 +1,6 @@
 package com.example.couphoneserver.service;
 
-import com.example.couphoneserver.common.exception.member.MemberException;
+import com.example.couphoneserver.common.exception.MemberException;
 import com.example.couphoneserver.domain.MemberGrade;
 import com.example.couphoneserver.domain.MemberStatus;
 import com.example.couphoneserver.domain.entity.Member;
