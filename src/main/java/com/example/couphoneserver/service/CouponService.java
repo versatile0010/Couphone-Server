@@ -1,6 +1,7 @@
 package com.example.couphoneserver.service;
 
 import com.example.couphoneserver.common.exception.BrandException;
+import com.example.couphoneserver.common.exception.CouponException;
 import com.example.couphoneserver.common.exception.DatabaseException;
 import com.example.couphoneserver.common.exception.MemberException;
 import com.example.couphoneserver.domain.CouponItemStatus;
@@ -46,6 +47,27 @@ public class CouponService {
         } catch (Exception e) {
             throw new DatabaseException(DATABASE_ERROR);
         }
+    }
+
+    public PatchCouponCountResponse patchCouponCount(PatchCouponCountRequest request) {
+        // 멤버 존재하는지 검사
+        findMemberById(request.getMemberId());
+
+        // 브랜드 존재하는지 검사
+        findBrandById(request.getBrandId());
+
+        // 쿠폰 찾기
+        CouponItem couponItem = couponItemRepository.findByMemberIdAndBrandIdAndStatus(request.getMemberId(), request.getBrandId(), CouponItemStatus.ACTIVE);
+
+        // 해당 쿠폰이 존재하지 않는 경우
+        if (couponItem == null) {
+            throw new CouponException(COUPON_NOT_FOUND);
+        }
+
+        // 쿠폰 스탬프 추가
+        couponItem.collectStamp();
+
+        return new PatchCouponCountResponse(couponItem);
     }
 
     private Member findMemberById(Long memberId) {
