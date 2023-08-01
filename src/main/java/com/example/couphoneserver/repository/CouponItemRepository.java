@@ -5,9 +5,10 @@ import com.example.couphoneserver.domain.entity.CouponItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CouponItemRepository extends JpaRepository<CouponItem, Long> {
     CouponItem findByMemberIdAndBrandIdAndStatus(Long mid, Long bid, CouponItemStatus status);
-    CouponItem findByMemberIdAndBrandId(Long mid, Long bid);
     List<CouponItem> findAllByMemberIdAndBrandId(Long mid, Long bid);
+    Optional<CouponItem> findById(Long couponId);
 }
