@@ -10,10 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 public class PatchCouponStatusRequest {
 
-    @Schema(description = "멤버 ID", example = "1")
-    Long memberId;
-
-    @Schema(description = "브랜드 ID", example = "1")
-    Long brandId;
+    @Schema(description = "쿠폰 ID", example = "1")
+    Long couponId;
 
 }
