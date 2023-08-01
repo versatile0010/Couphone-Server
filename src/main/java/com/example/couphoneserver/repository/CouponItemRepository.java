@@ -8,6 +8,5 @@ import java.util.Optional;
 
 public interface CouponItemRepository extends JpaRepository<CouponItem, Long> {
     CouponItem findByMemberIdAndBrandIdAndStatus(Long mid, Long bid, CouponItemStatus status);
-    CouponItem findByMemberIdAndBrandId(Long mid, Long bid);
     Optional<CouponItem> findById(Long couponId);
 }

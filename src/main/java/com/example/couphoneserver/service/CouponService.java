@@ -47,19 +47,9 @@ public class CouponService {
     }
 
     public PatchCouponCountResponse collectStamp(PatchCouponCountRequest request) {
-        // 멤버 존재하는지 검사
-        findMemberById(request.getMemberId());
-
-        // 브랜드 존재하는지 검사
-        findBrandById(request.getBrandId());
-
         // 쿠폰 찾기
-        CouponItem couponItem = couponItemRepository.findByMemberIdAndBrandId(request.getMemberId(), request.getBrandId());
-
-        // 해당 쿠폰이 존재하지 않는 경우
-        if (couponItem == null) {
-            throw new CouponException(COUPON_NOT_FOUND);
-        }
+        CouponItem couponItem = couponItemRepository.findById(request.getCouponId())
+                .orElseThrow(() -> new CouponException(COUPON_NOT_FOUND));
 
         // 해당 쿠폰을 적립할 수 없는 상태일 경우
         if (couponItem.getStatus() != CouponItemStatus.INACTIVE) {
@@ -68,7 +58,10 @@ public class CouponService {
 
         // 쿠폰 스탬프 추가
         couponItem.collectStamp();
-        couponItemRepository.save(couponItem);
+
+        if (couponItemRepository.save(couponItem) == null) {
+            throw new DatabaseException(DATABASE_ERROR);
+        }
 
         // 예외 처리,,, 해야 함
 

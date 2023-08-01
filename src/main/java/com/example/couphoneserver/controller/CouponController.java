@@ -22,7 +22,7 @@ public class CouponController {
     }
 
     @PatchMapping("/stamp")
-    @Operation(summary = "쿠폰 스탬프 적립", description = "Request Body에 브랜드 ID, 멤버 ID 넣어주세요!")
+    @Operation(summary = "쿠폰 스탬프 적립", description = "Request Body에 쿠폰 ID 넣어주세요!")
     public BaseResponse<PatchCouponCountResponse> patchCouponItemCount(@RequestBody PatchCouponCountRequest request) {
         return new BaseResponse<>(couponService.collectStamp(request));
     }
