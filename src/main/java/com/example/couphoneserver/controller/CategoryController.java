@@ -1,9 +1,11 @@
 package com.example.couphoneserver.controller;
 
+import com.example.couphoneserver.common.datatype.Coordinate;
 import com.example.couphoneserver.common.response.BaseErrorResponse;
 import com.example.couphoneserver.common.response.BaseResponse;
 import com.example.couphoneserver.dto.category.GetCategoryResponse;
 import com.example.couphoneserver.service.CategoryService;
+import com.example.couphoneserver.utils.CoordinateConverter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -25,6 +27,7 @@ import java.util.List;
 public class CategoryController {
 
     private final CategoryService categoryService;
+    private final CoordinateConverter coordinateConverter;
 
     @GetMapping("")
     @Operation(summary = "카테고리 정보 제공", description = "카테고리 정보를 제공합니다.", responses = {
@@ -35,5 +38,10 @@ public class CategoryController {
     public BaseResponse<List<GetCategoryResponse>> getCategory(@Parameter(name = "query", description = "카테고리의 이름(선택)", in = ParameterIn.QUERY)
             @RequestParam(required = false) String query){
         return new BaseResponse<>(categoryService.findCategory(query));
+    }
+
+    @RequestMapping("/test")
+    public BaseResponse<Coordinate> testmethod(){
+        return new BaseResponse<>(coordinateConverter.getCoordinate("경기 고양시 덕양구 중앙로558번길 57"));
     }
 }

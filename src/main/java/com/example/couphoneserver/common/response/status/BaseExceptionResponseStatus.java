@@ -54,7 +54,11 @@ public enum BaseExceptionResponseStatus implements ResponseStatus {
      * 7000: 브랜드 오류
      */
     BRAND_NOT_FOUND(7000, HttpStatus.BAD_REQUEST.value(), "브랜드가 존재하지 않습니다."),
-    DUPLICATE_BRAND_NAME(7001, HttpStatus.BAD_REQUEST.value(), "중복된 브랜드 이름이 존재합니다.");
+    DUPLICATE_BRAND_NAME(7001, HttpStatus.BAD_REQUEST.value(), "중복된 브랜드 이름이 존재합니다."),
+    /**
+     * 8000: 가게 오류
+     */
+    COORDINATE_NOT_FOUND(8000,HttpStatus.BAD_REQUEST.value(), "좌표를 찾을 수 없습니다.");
 
     private final int code;
     private final int status;
