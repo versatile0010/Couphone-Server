@@ -8,7 +8,7 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PatchCouponCountRequest {
+public class PatchCouponStatusRequest {
 
     @Schema(description = "쿠폰 ID", example = "1")
     Long couponId;
