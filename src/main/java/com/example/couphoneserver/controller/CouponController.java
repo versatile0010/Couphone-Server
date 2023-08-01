@@ -21,15 +21,15 @@ public class CouponController {
         return new BaseResponse<>(couponService.saveCoupon(request));
     }
 
-    @PatchMapping("/stamp")
-    @Operation(summary = "쿠폰 스탬프 적립", description = "Request Body에 쿠폰 ID 넣어주세요!")
-    public BaseResponse<PatchCouponCountResponse> patchCouponItemCount(@RequestBody PatchCouponCountRequest request) {
-        return new BaseResponse<>(couponService.collectStamp(request));
+    @PatchMapping("/stamp/{coupon-id}")
+    @Operation(summary = "쿠폰 스탬프 적립", description = "Path Variable로 쿠폰 ID 넣어주세요!")
+    public BaseResponse<PatchCouponCountResponse> patchCouponItemCount(@PathVariable("coupon-id") Long couponId) {
+        return new BaseResponse<>(couponService.collectStamp(couponId));
     }
 
-    @PatchMapping("/status")
-    @Operation(summary = "쿠폰 사용하기", description = "Request Body에 쿠폰 ID 넣어주세요!")
-    public BaseResponse<PatchCouponStatusResponse> patchCouponItemStatus(@RequestBody PatchCouponStatusRequest request) {
-        return new BaseResponse<>(couponService.useCoupon(request));
+    @PatchMapping("/status/{coupon-id}")
+    @Operation(summary = "쿠폰 사용하기", description = "Path Variable로 쿠폰 ID 넣어주세요!")
+    public BaseResponse<PatchCouponStatusResponse> patchCouponItemStatus(@PathVariable("coupon-id") Long couponId) {
+        return new BaseResponse<>(couponService.useCoupon(couponId));
     }
 }

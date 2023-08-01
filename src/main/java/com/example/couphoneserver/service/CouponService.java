@@ -46,9 +46,9 @@ public class CouponService {
         return new PostCouponResponse(couponItem);
     }
 
-    public PatchCouponCountResponse collectStamp(PatchCouponCountRequest request) {
+    public PatchCouponCountResponse collectStamp(Long couponId) {
         // 쿠폰 찾기
-        CouponItem couponItem = couponItemRepository.findById(request.getCouponId())
+        CouponItem couponItem = couponItemRepository.findById(couponId)
                 .orElseThrow(() -> new CouponException(COUPON_NOT_FOUND));
 
         // 해당 쿠폰을 적립할 수 없는 상태일 경우
@@ -68,9 +68,9 @@ public class CouponService {
         return new PatchCouponCountResponse(couponItem);
     }
 
-    public PatchCouponStatusResponse useCoupon(PatchCouponStatusRequest request) {
+    public PatchCouponStatusResponse useCoupon(Long couponId) {
         // 쿠폰 찾기
-        CouponItem couponItem = couponItemRepository.findById(request.getCouponId())
+        CouponItem couponItem = couponItemRepository.findById(couponId)
                 .orElseThrow(() -> new CouponException(COUPON_NOT_FOUND));
 
         // 해당 쿠폰을 사용할 수 없는 상태일 경우
