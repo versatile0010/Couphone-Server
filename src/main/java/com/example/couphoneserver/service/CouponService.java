@@ -38,7 +38,7 @@ public class CouponService {
 
         // 쿠폰 생성
         CouponItem couponItem = request.toEntity(member, brand);
-        
+
         if (couponItemRepository.save(couponItem) == null) {
             throw new DatabaseException(DATABASE_ERROR);
         }
