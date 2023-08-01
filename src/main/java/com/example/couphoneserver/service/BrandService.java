@@ -1,17 +1,16 @@
 package com.example.couphoneserver.service;
 
-import com.example.couphoneserver.common.exception.BrandException;
-import com.example.couphoneserver.common.exception.CategoryException;
-import com.example.couphoneserver.common.exception.DatabaseException;
-import com.example.couphoneserver.common.exception.MemberException;
+import com.example.couphoneserver.common.exception.*;
 import com.example.couphoneserver.domain.CouponItemStatus;
 import com.example.couphoneserver.domain.entity.Brand;
 import com.example.couphoneserver.domain.entity.Category;
 import com.example.couphoneserver.domain.entity.CouponItem;
 import com.example.couphoneserver.domain.entity.Member;
+import com.example.couphoneserver.dto.brand.GetBrandDetailResponse;
 import com.example.couphoneserver.dto.brand.GetBrandResponse;
 import com.example.couphoneserver.dto.brand.PostBrandRequest;
 import com.example.couphoneserver.dto.brand.PostBrandResponse;
+import com.example.couphoneserver.dto.coupon.GetCouponResponse;
 import com.example.couphoneserver.repository.BrandRepository;
 import com.example.couphoneserver.repository.CategoryRepository;
 import com.example.couphoneserver.repository.CouponItemRepository;
@@ -99,6 +98,28 @@ public class BrandService {
         }
 
         return brandList;
+    }
+
+    public GetBrandDetailResponse getBrandDetail(Long bid, Long mid) {
+        // 멤버 존재하는지 검사
+        findMemberById(mid);
+
+        // 브랜드 존재하는지 검사
+        Brand brand = findById(bid);
+
+        // 쿠폰 찾기
+        List<CouponItem> couponItems = couponItemRepository.findAllByMemberIdAndBrandId(mid, bid);
+        List<GetCouponResponse> getCoupons = new ArrayList<>();
+        for (CouponItem couponItem: couponItems) {
+            getCoupons.add(new GetCouponResponse(couponItem));
+        }
+
+        return new GetBrandDetailResponse(brand, getCoupons);
+    }
+
+    private Brand findById(Long id) {
+        return brandRepository.findById(id)
+                .orElseThrow(() -> new BrandException(BRAND_NOT_FOUND));
     }
 
     private Category findCategoryById(Long categoryId) {
