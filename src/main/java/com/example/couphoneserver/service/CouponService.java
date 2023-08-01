@@ -8,10 +8,7 @@ import com.example.couphoneserver.domain.CouponItemStatus;
 import com.example.couphoneserver.domain.entity.Brand;
 import com.example.couphoneserver.domain.entity.CouponItem;
 import com.example.couphoneserver.domain.entity.Member;
-import com.example.couphoneserver.dto.coupon.PatchCouponCountRequest;
-import com.example.couphoneserver.dto.coupon.PatchCouponCountResponse;
-import com.example.couphoneserver.dto.coupon.PostCouponRequest;
-import com.example.couphoneserver.dto.coupon.PostCouponResponse;
+import com.example.couphoneserver.dto.coupon.*;
 import com.example.couphoneserver.repository.BrandRepository;
 import com.example.couphoneserver.repository.CouponItemRepository;
 import com.example.couphoneserver.repository.MemberRepository;
@@ -76,6 +73,36 @@ public class CouponService {
         // 예외 처리,,, 해야 함
 
         return new PatchCouponCountResponse(couponItem);
+    }
+
+    public PatchCouponStatusResponse useCoupon(PatchCouponStatusRequest request) {
+        // 멤버 존재하는지 검사
+        findMemberById(request.getMemberId());
+
+        // 브랜드 존재하는지 검사
+        findBrandById(request.getBrandId());
+
+        // 쿠폰 찾기
+        CouponItem couponItem = couponItemRepository.findByMemberIdAndBrandId(request.getMemberId(), request.getBrandId());
+
+        // 해당 쿠폰이 존재하지 않는 경우
+        if (couponItem == null) {
+            throw new CouponException(COUPON_NOT_FOUND);
+        }
+
+        // 해당 쿠폰을 사용할 수 없는 상태일 경우
+        if (couponItem.getStatus() != CouponItemStatus.ACTIVE) {
+            throw new CouponException(COUPON_NOT_ACTIVE);
+        }
+
+        // 쿠폰 사용하기
+        couponItem.setStatus(CouponItemStatus.EXPIRED);
+
+        if (couponItemRepository.save(couponItem) == null) {
+            throw new DatabaseException(DATABASE_ERROR);
+        }
+
+        return new PatchCouponStatusResponse(couponItem);
     }
 
     private Member findMemberById(Long memberId) {

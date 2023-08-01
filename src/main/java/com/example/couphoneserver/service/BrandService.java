@@ -39,14 +39,15 @@ public class BrandService {
         // 브랜드 이름 중복 검사
         existsBrandByName(request.getName());
 
-        try {
-            Brand brand = request.toEntity(category);
-            brandRepository.save(brand);
 
-            return new PostBrandResponse(brand);
-        } catch (Exception e) {
+        // 브랜드 저장
+        Brand brand = brandRepository.save(request.toEntity(category));
+
+        if (brand == null) {
             throw new DatabaseException(DATABASE_ERROR);
         }
+
+        return new PostBrandResponse(brand);
     }
 
     public List<GetBrandResponse> findByCategoryId(Long mid, Long cid) {
