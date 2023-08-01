@@ -1,10 +1,12 @@
 package com.example.couphoneserver.utils.jwt;
 
+import com.example.couphoneserver.common.exception.MemberException;
 import com.example.couphoneserver.common.exception.jwt.bad_request.JwtNoTokenException;
 import com.example.couphoneserver.common.exception.jwt.bad_request.JwtUnsupportedTokenException;
 import com.example.couphoneserver.common.exception.jwt.unauthorized.JwtInvalidTokenException;
 import com.example.couphoneserver.common.exception.jwt.unauthorized.JwtMalformedTokenException;
 import com.example.couphoneserver.domain.entity.RefreshToken;
+import com.example.couphoneserver.repository.MemberRepository;
 import com.example.couphoneserver.repository.RefreshTokenRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -23,7 +25,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.Collection;
+import java.util.Date;
 import java.util.stream.Collectors;
 
 import static com.example.couphoneserver.common.response.status.BaseExceptionResponseStatus.*;
@@ -47,6 +52,8 @@ public class JwtTokenProvider implements InitializingBean {
     private final String AUTHORITIES_KEY = "auth";
     private final RefreshTokenRepository refreshTokenRepository;
 
+    private final MemberRepository memberRepository;
+
     @PostConstruct
     protected void init() {
         String encodedKey = Base64.getEncoder().encodeToString(JWT_SECRET_KEY.getBytes());
@@ -61,9 +68,13 @@ public class JwtTokenProvider implements InitializingBean {
         Date now = new Date();
         Date expiration = new Date(now.getTime() + accessTokenValidTime);
 
+        String email = authentication.getName();
+        Long userId = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND)).getId();
         return Jwts.builder()
                 .setSubject(authentication.getName())
                 .claim(AUTHORITIES_KEY, authorities)
+                .claim("userId", String.valueOf(userId))
                 .setIssuedAt(now)
                 .setExpiration(expiration)
                 .signWith(key, SignatureAlgorithm.HS256)
@@ -117,6 +128,20 @@ public class JwtTokenProvider implements InitializingBean {
         }
     }
 
+    public JwtCode validateToke(String token) {
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token);
+            return JwtCode.ACCESS;
+        } catch (ExpiredJwtException e) {
+            return JwtCode.EXPIRED;
+        } catch (Exception e) {
+            return JwtCode.DENIED;
+        }
+    }
+
     public String getPrincipal(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key).build()
@@ -131,7 +156,7 @@ public class JwtTokenProvider implements InitializingBean {
 
     public Long getUserId(String token) {
         Claims claims = getClaims(token);
-        return claims.get("userId", Long.class);
+        return Long.parseLong(claims.get("userId", String.class));
     }
 
     private Claims getClaims(String token) {
