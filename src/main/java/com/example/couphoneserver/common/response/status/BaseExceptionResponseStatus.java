@@ -61,7 +61,8 @@ public enum BaseExceptionResponseStatus implements ResponseStatus {
      */
     COUPON_NOT_FOUND(9000, HttpStatus.BAD_REQUEST.value(), "쿠폰이 존재하지 않습니다."),
     COUPON_NOT_COLLECT(9001, HttpStatus.BAD_REQUEST.value(), "적립할 수 없는 쿠폰입니다."),
-    COUPON_NOT_ACTIVE(9002, HttpStatus.BAD_REQUEST.value(), "사용할 수 없는 쿠폰입니다.");
+    COUPON_NOT_ACTIVE(9002, HttpStatus.BAD_REQUEST.value(), "사용할 수 없는 쿠폰입니다."),
+    DUPLICATE_COUPON_INACTIVE(9003, HttpStatus.BAD_REQUEST.value(), "적립 가능한 쿠폰이 이미 존재합니다.");
 
     private final int code;
     private final int status;

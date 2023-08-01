@@ -36,6 +36,12 @@ public class CouponService {
         // 브랜드 존재하는지 검사
         Brand brand = findBrandById(request.getBrandId());
 
+        // 적립 가능한 쿠폰이 있을 경우
+        if (couponItemRepository.findByMemberIdAndBrandIdAndStatus(request.getMemberId(), request.getBrandId(), CouponItemStatus.INACTIVE) != null) {
+            throw new CouponException(DUPLICATE_COUPON_INACTIVE);
+
+        }
+
         // 쿠폰 생성
         CouponItem couponItem = request.toEntity(member, brand);
 
