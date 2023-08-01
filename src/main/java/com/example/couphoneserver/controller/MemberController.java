@@ -24,8 +24,8 @@ public class MemberController {
 
     @NoAuth
     @PostMapping
-    @Operation(summary = "휴대폰 번호로 회원 가입", description =
-            "Request Body 에 휴대폰 번호, 비밀번호를 담아서 보내주세요! 비밀번호는 DB 에 암호화되어 관리합니다.")
+    @Operation(summary = "이메일으로 회원 가입", description =
+            "Request Body 에 이메일, 비밀번호를 담아서 보내면 비밀번호는 DB 에 암호화되어 관리합니다.")
     public BaseResponse<MemberResponseDto> signup(@Valid @RequestBody AddMemberRequestDto request) {
         return new BaseResponse<>(memberService.save(request));
     }
