@@ -36,14 +36,14 @@ public class CouponService {
         // 브랜드 존재하는지 검사
         Brand brand = findBrandById(request.getBrandId());
 
-        try {
-            CouponItem couponItem = request.toEntity(member, brand);
-            couponItemRepository.save(couponItem);
-
-            return new PostCouponResponse(couponItem);
-        } catch (Exception e) {
+        // 쿠폰 생성
+        CouponItem couponItem = request.toEntity(member, brand);
+        
+        if (couponItemRepository.save(couponItem) == null) {
             throw new DatabaseException(DATABASE_ERROR);
         }
+
+        return new PostCouponResponse(couponItem);
     }
 
     public PatchCouponCountResponse collectStamp(PatchCouponCountRequest request) {
