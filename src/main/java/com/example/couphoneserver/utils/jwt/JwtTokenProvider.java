@@ -69,7 +69,7 @@ public class JwtTokenProvider implements InitializingBean {
         Date expiration = new Date(now.getTime() + accessTokenValidTime);
 
         String email = authentication.getName();
-        Long userId = memberRepository.findByEmail(email)
+        Long userId = memberRepository.findMemberByEmail(email)
                 .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND)).getId();
         return Jwts.builder()
                 .setSubject(authentication.getName())

@@ -58,6 +58,21 @@ public class MemberService {
     }
 
     @Transactional
+    public void saveByEmailAndName(LoginRequestDto dto) throws UsernameNotFoundException {
+        validateDuplicateMemberByEmail(dto.getEmail());
+        validateDuplicateMemberByName(dto.getName());
+        memberRepository.save(
+                new Member(dto.getName(), dto.getEmail(),
+                        MemberStatus.ACTIVE, MemberGrade.ROLE_MEMBER)
+        );
+    }
+
+    public boolean isExistingMember(LoginRequestDto requestDto) throws UsernameNotFoundException {
+        String email = requestDto.getEmail();
+        return memberRepository.findMemberByEmail(email).isPresent();
+    }
+
+    @Transactional
     public void setActive(Member member) {
         member.setActive();
     }
@@ -89,7 +104,7 @@ public class MemberService {
     @Transactional
     public LoginResponseDto signIn(LoginRequestDto loginRequestDto) {
         UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(loginRequestDto.getEmail(), loginRequestDto.getPassword());
+                new UsernamePasswordAuthenticationToken(loginRequestDto.getEmail(), loginRequestDto.getName());
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -102,14 +117,14 @@ public class MemberService {
 
         return LoginResponseDto.builder()
                 .accessToken(accessToken)
-                .tokenType("Bearer ")
+                .tokenType("JWT Bearer ")
                 .memberId(member.getId())
                 .grade(member.getGrade())
                 .build();
     }
 
     public Member findOneByEmail(String email) {
-        return memberRepository.findByEmail(email)
+        return memberRepository.findMemberByEmail(email)
                 .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
     }
 
@@ -124,7 +139,7 @@ public class MemberService {
      * 이름 중복 검증
      */
     private void validateDuplicateMemberByName(String name) {
-        List<Member> findMembers = memberRepository.findByName(name);
+        List<Member> findMembers = memberRepository.findMembersByName(name);
         if (!findMembers.isEmpty()) {
             throw new MemberException(DUPLICATED_MEMBER_EXCEPTION);
         }
@@ -149,7 +164,7 @@ public class MemberService {
      * 중복회원 검사
      */
     private void validateDuplicateMemberByEmail(String email) {
-        Optional<Member> optionalUser = memberRepository.findByEmail(email);
+        Optional<Member> optionalUser = memberRepository.findMemberByEmail(email);
         optionalUser.ifPresent(findUser -> {
             throw new MemberException(DUPLICATED_MEMBER_EXCEPTION);
         });
@@ -159,14 +174,15 @@ public class MemberService {
      * 휴대폰 번호로 회원 조회
      */
     public Optional<Member> getMemberByPhoneNumber(String phoneNumber) {
-        return memberRepository.findByPhoneNumber(phoneNumber);
+        return memberRepository.findMemberByPhoneNumber(phoneNumber);
     }
 
     /**
      * 이메일로 회원 조회
      */
     public Optional<Member> getMemberByEmail(String email) {
-        return memberRepository.findByEmail(email);
+        return memberRepository.findMemberByEmail(email);
     }
+
 
 }
