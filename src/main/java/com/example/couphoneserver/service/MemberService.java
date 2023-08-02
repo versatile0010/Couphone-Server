@@ -4,7 +4,6 @@ import com.example.couphoneserver.common.exception.MemberException;
 import com.example.couphoneserver.domain.MemberGrade;
 import com.example.couphoneserver.domain.MemberStatus;
 import com.example.couphoneserver.domain.entity.Member;
-import com.example.couphoneserver.dto.member.request.AddMemberRequestDto;
 import com.example.couphoneserver.dto.member.request.LoginRequestDto;
 import com.example.couphoneserver.dto.member.response.LoginResponseDto;
 import com.example.couphoneserver.dto.member.response.MemberInfoResponseDto;
@@ -42,20 +41,6 @@ public class MemberService {
     private final JwtTokenProvider jwtProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final RefreshTokenService refreshTokenService;
-
-    /**
-     * 이메일로 회원 가입
-     */
-    @Transactional
-    public MemberResponseDto save(AddMemberRequestDto dto) throws UsernameNotFoundException {
-        validateDuplicateMemberByEmail(dto.getEmail());
-        validateDuplicateMemberByName(dto.getName());
-        Member savedMember = memberRepository.save(
-                new Member(dto.getName(), dto.getEmail(), bCryptPasswordEncoder.encode(dto.getPassword()),
-                        MemberStatus.ACTIVE, MemberGrade.ROLE_MEMBER)
-        );
-        return new MemberResponseDto(savedMember);
-    }
 
     @Transactional
     public void saveByEmailAndName(LoginRequestDto dto) throws UsernameNotFoundException {
