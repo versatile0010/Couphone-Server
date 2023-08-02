@@ -54,7 +54,7 @@ public class MemberServiceTest {
         // given
         Member member = Member.builder()
                 .name("kim")
-                .phoneNumber("010-1111-1111")
+                .email("aaa@naver.com")
                 .password("1234")
                 .build();
         // when
@@ -74,17 +74,17 @@ public class MemberServiceTest {
         // given
         Member memberKim1 = Member.builder()
                 .name("kim")
-                .phoneNumber("010-1111-1111")
+                .email("aaa@naver.com")
                 .password("1234")
                 .build();
         Member memberKim2 = Member.builder()
                 .name("kim")
-                .phoneNumber("010-2222-2222")
+                .email("bbb@naver.com")
                 .password("1234")
                 .build();
         Member memberLee = Member.builder()
                 .name("lee")
-                .phoneNumber("010-3333-3333")
+                .email("ccc@naver.com")
                 .password("1234")
                 .build();
         memberService.join(memberKim1);
@@ -103,17 +103,17 @@ public class MemberServiceTest {
         memberRepository.deleteAll();
         Member member1 = Member.builder()
                 .name("yee")
-                .phoneNumber("010-1111-1111")
+                .email("aaa@naver.com")
                 .password("1234")
                 .build();
         Member member2 = Member.builder()
                 .name("kim")
-                .phoneNumber("010-2222-2222")
+                .email("bbb@naver.com")
                 .password("1234")
                 .build();
         Member member3 = Member.builder()
                 .name("lee")
-                .phoneNumber("010-3333-3333")
+                .email("ccc@naver.com")
                 .password("1234")
                 .build();
         // when
@@ -131,17 +131,17 @@ public class MemberServiceTest {
         // given
         Member member1 = Member.builder()
                 .name("kim")
-                .phoneNumber("010-1111-1111")
+                .email("aaa@naver.com")
                 .password("1234")
                 .build();
         Member member2 = Member.builder()
                 .name("yoo")
-                .phoneNumber("010-2222-2222")
+                .email("bbb@naver.com")
                 .password("1234")
                 .build();
         Member member3 = Member.builder()
                 .name("lee")
-                .phoneNumber("010-3333-3333")
+                .email("ccc@naver.com")
                 .password("1234")
                 .build();
         // when
@@ -164,7 +164,7 @@ public class MemberServiceTest {
         // given
         Member member = Member.builder()
                 .name("lee")
-                .phoneNumber("010-1111-2222")
+                .email("aaa@naver.com")
                 .password("1234")
                 .build();
         // when
@@ -179,7 +179,7 @@ public class MemberServiceTest {
         LocalDateTime now = LocalDateTime.of(2023, 7, 20, 0, 0, 0);
         Member member = Member.builder()
                 .name("lee")
-                .phoneNumber("010-1111-2222")
+                .email("aaa@naver.com")
                 .password("1234")
                 .build();
         // when
@@ -197,14 +197,14 @@ public class MemberServiceTest {
     @Test
     public void 회원_로그인_요청_토큰_발급_및_상태_ACTIVE() throws Exception {
         // given
-        String phoneNumber = "010-1111-2222";
+        String email = "aaa@naver.com";
         String password = "12345678";
         String name = "김테스트";
         String encodedPassword = passwordEncoder.encode(password);
-        AddMemberRequestDto addMemberRequestDto = new AddMemberRequestDto(name, phoneNumber, password);
+        AddMemberRequestDto addMemberRequestDto = new AddMemberRequestDto(name, email, password);
         MemberResponseDto memberResponseDto = memberService.save(addMemberRequestDto);
         // when
-        LoginRequestDto loginRequest = new LoginRequestDto(phoneNumber, password);
+        LoginRequestDto loginRequest = new LoginRequestDto(email, password);
         LoginResponseDto loginResponse = memberService.signIn(loginRequest);
 
         Member member = memberService.findOneById(memberResponseDto.getId());

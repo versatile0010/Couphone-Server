@@ -9,4 +9,5 @@ import java.util.Optional;
 public interface MemberRepository extends JpaRepository<Member, Long> {
     List<Member> findByName(String name);
     Optional<Member> findByPhoneNumber(String phoneNumber); // phoneNumber 으로 사용자 정보를 가져옴.
+    Optional<Member> findByEmail(String email);
 }
