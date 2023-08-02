@@ -61,6 +61,13 @@ public class Member extends BaseTimeEntity implements UserDetails {
         this.grade = grade;
     }
 
+    public Member(String name, String email, MemberStatus status, MemberGrade grade) {
+        this.name = name;
+        this.email = email;
+        this.status = status;
+        this.grade = grade;
+    }
+
     // [Spring Security] 사용자 인증 정보 접근
 
     /**
