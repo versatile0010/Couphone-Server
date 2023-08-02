@@ -58,7 +58,9 @@ public enum BaseExceptionResponseStatus implements ResponseStatus {
     /**
      * 8000: 가게 오류
      */
-    COORDINATE_NOT_FOUND(8000,HttpStatus.BAD_REQUEST.value(), "좌표를 찾을 수 없습니다.");
+    COORDINATE_NOT_FOUND(8000,HttpStatus.BAD_REQUEST.value(), "좌표를 찾을 수 없습니다."),
+    DUPLICATE_STORE_NAME(8001,HttpStatus.BAD_REQUEST.value(), "중복된 지점이 존재합니다."),
+    NEARBY_STORE_NOT_FOUND(8002,HttpStatus.BAD_REQUEST.value(), "좌표 기준 주변 가게가 없습니다.");
 
     private final int code;
     private final int status;
