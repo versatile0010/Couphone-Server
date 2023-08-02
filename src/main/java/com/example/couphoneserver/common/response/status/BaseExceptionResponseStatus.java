@@ -60,7 +60,15 @@ public enum BaseExceptionResponseStatus implements ResponseStatus {
      */
     COORDINATE_NOT_FOUND(8000,HttpStatus.BAD_REQUEST.value(), "좌표를 찾을 수 없습니다."),
     DUPLICATE_STORE_NAME(8001,HttpStatus.BAD_REQUEST.value(), "중복된 지점이 존재합니다."),
-    NEARBY_STORE_NOT_FOUND(8002,HttpStatus.BAD_REQUEST.value(), "좌표 기준 주변 가게가 없습니다.");
+    NEARBY_STORE_NOT_FOUND(8002,HttpStatus.BAD_REQUEST.value(), "좌표 기준 주변 가게가 없습니다."),
+
+    /**
+     * 9000: 쿠폰 오류
+     */
+    COUPON_NOT_FOUND(9000, HttpStatus.BAD_REQUEST.value(), "쿠폰이 존재하지 않습니다."),
+    COUPON_NOT_COLLECT(9001, HttpStatus.BAD_REQUEST.value(), "적립할 수 없는 쿠폰입니다."),
+    COUPON_NOT_ACTIVE(9002, HttpStatus.BAD_REQUEST.value(), "사용할 수 없는 쿠폰입니다."),
+    DUPLICATE_COUPON_INACTIVE(9003, HttpStatus.BAD_REQUEST.value(), "적립 가능한 쿠폰이 이미 존재합니다.");
 
     private final int code;
     private final int status;

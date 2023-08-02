@@ -30,9 +30,9 @@ public class Member extends BaseTimeEntity implements UserDetails {
     private Long id;
     @Column(name = "name")
     private String name;
-    @Column(name = "email")
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
-    @Column(name = "phone_number", nullable = false, unique = true)
+    @Column(name = "phone_number")
     private String phoneNumber;
     @Column(name = "password")
     private String password;
@@ -47,16 +47,23 @@ public class Member extends BaseTimeEntity implements UserDetails {
     private List<CouponItem> coupons = new ArrayList<>();
 
     @Builder
-    public Member(String name, String phoneNumber, String password, String auth) {
+    public Member(String name, String email, String password, String auth) {
         this.name = name;
-        this.phoneNumber = phoneNumber;
+        this.email = email;
         this.password = password;
     }
 
-    public Member(String name, String phoneNumber, String password, MemberStatus status, MemberGrade grade) {
+    public Member(String name, String email, String password, MemberStatus status, MemberGrade grade) {
         this.name = name;
-        this.phoneNumber = phoneNumber;
+        this.email = email;
         this.password = password;
+        this.status = status;
+        this.grade = grade;
+    }
+
+    public Member(String name, String email, MemberStatus status, MemberGrade grade) {
+        this.name = name;
+        this.email = email;
         this.status = status;
         this.grade = grade;
     }
@@ -84,7 +91,7 @@ public class Member extends BaseTimeEntity implements UserDetails {
      */
     @Override
     public String getUsername() {
-        return phoneNumber; // 사용자의 고유한 값을 반환
+        return email; // 사용자의 고유한 값을 반환
     }
 
     /**

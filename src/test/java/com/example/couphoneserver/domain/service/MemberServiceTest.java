@@ -3,14 +3,13 @@ package com.example.couphoneserver.domain.service;
 import com.example.couphoneserver.common.exception.MemberException;
 import com.example.couphoneserver.domain.MemberStatus;
 import com.example.couphoneserver.domain.entity.Member;
-import com.example.couphoneserver.dto.member.request.AddMemberRequestDto;
 import com.example.couphoneserver.dto.member.request.LoginRequestDto;
 import com.example.couphoneserver.dto.member.response.LoginResponseDto;
-import com.example.couphoneserver.dto.member.response.MemberResponseDto;
 import com.example.couphoneserver.repository.BrandRepository;
 import com.example.couphoneserver.repository.MemberRepository;
 import com.example.couphoneserver.repository.StoreRepository;
 import com.example.couphoneserver.service.MemberService;
+import jdk.jfr.Description;
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
@@ -54,7 +53,7 @@ public class MemberServiceTest {
         // given
         Member member = Member.builder()
                 .name("kim")
-                .phoneNumber("010-1111-1111")
+                .email("aaa@naver.com")
                 .password("1234")
                 .build();
         // when
@@ -74,17 +73,17 @@ public class MemberServiceTest {
         // given
         Member memberKim1 = Member.builder()
                 .name("kim")
-                .phoneNumber("010-1111-1111")
+                .email("aaa@naver.com")
                 .password("1234")
                 .build();
         Member memberKim2 = Member.builder()
                 .name("kim")
-                .phoneNumber("010-2222-2222")
+                .email("bbb@naver.com")
                 .password("1234")
                 .build();
         Member memberLee = Member.builder()
                 .name("lee")
-                .phoneNumber("010-3333-3333")
+                .email("ccc@naver.com")
                 .password("1234")
                 .build();
         memberService.join(memberKim1);
@@ -103,17 +102,17 @@ public class MemberServiceTest {
         memberRepository.deleteAll();
         Member member1 = Member.builder()
                 .name("yee")
-                .phoneNumber("010-1111-1111")
+                .email("aaa@naver.com")
                 .password("1234")
                 .build();
         Member member2 = Member.builder()
                 .name("kim")
-                .phoneNumber("010-2222-2222")
+                .email("bbb@naver.com")
                 .password("1234")
                 .build();
         Member member3 = Member.builder()
                 .name("lee")
-                .phoneNumber("010-3333-3333")
+                .email("ccc@naver.com")
                 .password("1234")
                 .build();
         // when
@@ -131,17 +130,17 @@ public class MemberServiceTest {
         // given
         Member member1 = Member.builder()
                 .name("kim")
-                .phoneNumber("010-1111-1111")
+                .email("aaa@naver.com")
                 .password("1234")
                 .build();
         Member member2 = Member.builder()
                 .name("yoo")
-                .phoneNumber("010-2222-2222")
+                .email("bbb@naver.com")
                 .password("1234")
                 .build();
         Member member3 = Member.builder()
                 .name("lee")
-                .phoneNumber("010-3333-3333")
+                .email("ccc@naver.com")
                 .password("1234")
                 .build();
         // when
@@ -164,7 +163,7 @@ public class MemberServiceTest {
         // given
         Member member = Member.builder()
                 .name("lee")
-                .phoneNumber("010-1111-2222")
+                .email("aaa@naver.com")
                 .password("1234")
                 .build();
         // when
@@ -179,7 +178,7 @@ public class MemberServiceTest {
         LocalDateTime now = LocalDateTime.of(2023, 7, 20, 0, 0, 0);
         Member member = Member.builder()
                 .name("lee")
-                .phoneNumber("010-1111-2222")
+                .email("aaa@naver.com")
                 .password("1234")
                 .build();
         // when
@@ -195,23 +194,42 @@ public class MemberServiceTest {
     }
 
     @Test
-    public void 회원_로그인_요청_토큰_발급_및_상태_ACTIVE() throws Exception {
+    @Description("비회원이면 회원 가입을 먼저 수행한 뒤, 로그인 처리 후 토큰을 발급합니다.")
+    public void 회원_로그인_요청_시_토큰_발급_및_상태_ACTIVE() throws Exception {
         // given
-        String phoneNumber = "010-1111-2222";
-        String password = "12345678";
+        String email = "aaa@naver.com";
         String name = "김테스트";
-        String encodedPassword = passwordEncoder.encode(password);
-        AddMemberRequestDto addMemberRequestDto = new AddMemberRequestDto(name, phoneNumber, password);
-        MemberResponseDto memberResponseDto = memberService.save(addMemberRequestDto);
         // when
-        LoginRequestDto loginRequest = new LoginRequestDto(phoneNumber, password);
+        LoginRequestDto loginRequest = new LoginRequestDto(email, name);
+        if (!memberService.isExistingMember(loginRequest)) {
+            memberService.saveByEmailAndName(loginRequest);
+        }
         LoginResponseDto loginResponse = memberService.signIn(loginRequest);
 
-        Member member = memberService.findOneById(memberResponseDto.getId());
+        Member member = memberService.findOneById(loginResponse.getMemberId());
         // then
         assertAll(
                 () -> assertThat(member.getStatus()).isEqualTo(MemberStatus.ACTIVE),
                 () -> assertNotNull(loginResponse.getAccessToken())
+        );
+    }
+
+    @Test
+    public void 이메일로_회원_조회() throws Exception {
+        // given
+        String email = "aaa@naver.com";
+        String name = "김테스트";
+        // when
+        LoginRequestDto loginRequest = new LoginRequestDto(email, name);
+        if (!memberService.isExistingMember(loginRequest)) {
+            memberService.saveByEmailAndName(loginRequest);
+        }
+        LoginResponseDto loginResponse = memberService.signIn(loginRequest);
+        Member member = memberService.findOneByEmail(email);
+        // then
+        assertAll(
+                () -> assertThat(member.getEmail()).isEqualTo(email),
+                () -> assertThat(member.getName()).isEqualTo(name)
         );
     }
 }

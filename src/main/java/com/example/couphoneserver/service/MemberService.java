@@ -44,27 +44,44 @@ public class MemberService {
     private final RefreshTokenService refreshTokenService;
 
     /**
-     *  휴대폰 번호로 회원 가입
+     * 이메일로 회원 가입
      */
     @Transactional
     public MemberResponseDto save(AddMemberRequestDto dto) throws UsernameNotFoundException {
-        validateDuplicateMemberByPhoneNumber(dto.getPhoneNumber());
+        validateDuplicateMemberByEmail(dto.getEmail());
         validateDuplicateMemberByName(dto.getName());
         Member savedMember = memberRepository.save(
-                new Member(dto.getName(), dto.getPhoneNumber(), bCryptPasswordEncoder.encode(dto.getPassword()),
+                new Member(dto.getName(), dto.getEmail(), bCryptPasswordEncoder.encode(dto.getPassword()),
                         MemberStatus.ACTIVE, MemberGrade.ROLE_MEMBER)
         );
         return new MemberResponseDto(savedMember);
     }
 
     @Transactional
-    public void setActive(Member member){
+    public void saveByEmailAndName(LoginRequestDto dto) throws UsernameNotFoundException {
+        validateDuplicateMemberByEmail(dto.getEmail());
+        validateDuplicateMemberByName(dto.getName());
+        memberRepository.save(
+                new Member(dto.getName(), dto.getEmail(),
+                        MemberStatus.ACTIVE, MemberGrade.ROLE_MEMBER)
+        );
+    }
+
+    public boolean isExistingMember(LoginRequestDto requestDto) throws UsernameNotFoundException {
+        String email = requestDto.getEmail();
+        return memberRepository.findMemberByEmail(email).isPresent();
+    }
+
+    @Transactional
+    public void setActive(Member member) {
         member.setActive();
     }
+
     @Transactional
-    public void setGrade(Member member, MemberGrade grade){
+    public void setGrade(Member member, MemberGrade grade) {
         member.setGrade(grade);
     }
+
     /**
      * 회원 가입
      */
@@ -79,15 +96,15 @@ public class MemberService {
      * 회원 탈퇴 처리
      */
     @Transactional
-    public MemberResponseDto delete(Member member){
+    public MemberResponseDto delete(Member member) {
         member.setTerminated();
         return new MemberResponseDto(member);
     }
 
     @Transactional
-    public LoginResponseDto signIn(LoginRequestDto loginRequestDto){
+    public LoginResponseDto signIn(LoginRequestDto loginRequestDto) {
         UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(loginRequestDto.getPhoneNumber(), loginRequestDto.getPassword());
+                new UsernamePasswordAuthenticationToken(loginRequestDto.getEmail(), loginRequestDto.getName());
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -100,16 +117,21 @@ public class MemberService {
 
         return LoginResponseDto.builder()
                 .accessToken(accessToken)
-                .tokenType("Bearer ")
+                .tokenType("JWT Bearer ")
                 .memberId(member.getId())
                 .grade(member.getGrade())
                 .build();
     }
 
+    public Member findOneByEmail(String email) {
+        return memberRepository.findMemberByEmail(email)
+                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
+    }
+
     /**
      * 단일 회원 정보 조회
      */
-    public MemberInfoResponseDto getMemberInfo(Member member){
+    public MemberInfoResponseDto getMemberInfo(Member member) {
         return new MemberInfoResponseDto(member);
     }
 
@@ -117,7 +139,7 @@ public class MemberService {
      * 이름 중복 검증
      */
     private void validateDuplicateMemberByName(String name) {
-        List<Member> findMembers = memberRepository.findByName(name);
+        List<Member> findMembers = memberRepository.findMembersByName(name);
         if (!findMembers.isEmpty()) {
             throw new MemberException(DUPLICATED_MEMBER_EXCEPTION);
         }
@@ -141,16 +163,26 @@ public class MemberService {
     /**
      * 중복회원 검사
      */
-    private void validateDuplicateMemberByPhoneNumber(String phoneNumber) {
-        Optional<Member> optionalUser = memberRepository.findByPhoneNumber(phoneNumber);
+    private void validateDuplicateMemberByEmail(String email) {
+        Optional<Member> optionalUser = memberRepository.findMemberByEmail(email);
         optionalUser.ifPresent(findUser -> {
             throw new MemberException(DUPLICATED_MEMBER_EXCEPTION);
         });
     }
+
     /**
-     *  휴대폰 번호로 회원 조회
+     * 휴대폰 번호로 회원 조회
      */
-    public Optional<Member> getMemberByPhoneNumber(String phoneNumber){
-        return memberRepository.findByPhoneNumber(phoneNumber);
+    public Optional<Member> getMemberByPhoneNumber(String phoneNumber) {
+        return memberRepository.findMemberByPhoneNumber(phoneNumber);
     }
+
+    /**
+     * 이메일로 회원 조회
+     */
+    public Optional<Member> getMemberByEmail(String email) {
+        return memberRepository.findMemberByEmail(email);
+    }
+
+
 }

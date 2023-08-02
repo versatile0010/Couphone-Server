@@ -19,9 +19,9 @@ INSERT INTO store (store_id, latitude, longitude, brand_id, created_date, modifi
 INSERT INTO store (store_id, latitude, longitude, brand_id, created_date, modified_date, city, name, status, street, zipcode) VALUES (3, 37.12345, -100.67890, 2, '2023-07-31 13:00:00', '2023-07-31 13:00:00', '서울특별시', '컴포즈커피 건대입구점', 'ACTIVE', '건대입구로', '1111');
 
 -- 샘플 데이터 생성: coupon_item 테이블
-INSERT INTO coupon_item (coupon_item_id, stamp_count, brand_id, created_date, member_id, modified_date, status) VALUES (1, 5, 1, '2023-07-31 12:45:00', 1, '2023-07-31 12:45:00', 'ACTIVE');
+INSERT INTO coupon_item (coupon_item_id, stamp_count, brand_id, created_date, member_id, modified_date, status) VALUES (1, 5, 1, '2023-07-31 12:45:00', 1, '2023-07-31 12:45:00', 'INACTIVE');
 INSERT INTO coupon_item (coupon_item_id, stamp_count, brand_id, created_date, member_id, modified_date, status) VALUES (2, 3, 2, '2023-07-30 11:00:00', 1, '2023-07-30 11:00:00', 'EXPIRED');
-INSERT INTO coupon_item (coupon_item_id, stamp_count, brand_id, created_date, member_id, modified_date, status) VALUES (3, 4, 2, '2023-07-29 11:00:00', 1, '2023-07-30 11:00:00', 'ACTIVE');
-INSERT INTO coupon_item (coupon_item_id, stamp_count, brand_id, created_date, member_id, modified_date, status) VALUES (4, 1, 2, '2023-07-28 11:00:00', 2, '2023-07-30 11:00:00', 'ACTIVE');
-INSERT INTO coupon_item (coupon_item_id, stamp_count, brand_id, created_date, member_id, modified_date, status) VALUES (5, 2, 1, '2023-07-27 11:00:00', 2, '2023-07-30 11:00:00', 'ACTIVE');
-INSERT INTO coupon_item (coupon_item_id, stamp_count, brand_id, created_date, member_id, modified_date, status) VALUES (6, 9, 1, '2023-07-26 11:00:00', 2, '2023-07-30 11:00:00', 'EXPIRED');
+INSERT INTO coupon_item (coupon_item_id, stamp_count, brand_id, created_date, member_id, modified_date, status) VALUES (3, 4, 2, '2023-07-29 11:00:00', 1, '2023-07-30 11:00:00', 'INACTIVE');
+INSERT INTO coupon_item (coupon_item_id, stamp_count, brand_id, created_date, member_id, modified_date, status) VALUES (4, 1, 2, '2023-07-28 11:00:00', 2, '2023-07-30 11:00:00', 'INACTIVE');
+INSERT INTO coupon_item (coupon_item_id, stamp_count, brand_id, created_date, member_id, modified_date, status) VALUES (5, 2, 1, '2023-07-27 11:00:00', 2, '2023-07-30 11:00:00', 'INACTIVE');
+INSERT INTO coupon_item (coupon_item_id, stamp_count, brand_id, created_date, member_id, modified_date, status) VALUES (6, 10, 1, '2023-07-26 11:00:00', 2, '2023-07-30 11:00:00', 'ACTIVE');
