@@ -2,8 +2,8 @@ package com.example.couphoneserver.controller;
 
 import com.example.couphoneserver.common.response.BaseResponse;
 import com.example.couphoneserver.domain.entity.Member;
-import com.example.couphoneserver.dto.member.response.MemberInfoResponseDto;
-import com.example.couphoneserver.dto.member.response.MemberResponseDto;
+import com.example.couphoneserver.dto.member.response.GetMemberResponse;
+import com.example.couphoneserver.dto.member.response.PatchMemberResponse;
 import com.example.couphoneserver.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,7 +22,7 @@ public class MemberController {
     @PatchMapping("/{member-id}")
     @Operation(summary = "회원 탈퇴", description =
             "회원의 상태를 TERMINATED 으로 변경합니다. path variable 로 멤버 id 담아서 보내주세요!")
-    public BaseResponse<MemberResponseDto> delete(@PathVariable("member-id") Long memberId) {
+    public BaseResponse<PatchMemberResponse> delete(@PathVariable("member-id") Long memberId) {
         Member member = memberService.findOneById(memberId);
         return new BaseResponse<>(memberService.delete(member));
     }
@@ -30,7 +30,7 @@ public class MemberController {
     @GetMapping("/{member-id}")
     @Operation(summary = "회원 정보 조회", description =
             "회원 정보를 조회합니다. path variable 로 멤버 id 담아서 보내주세요!")
-    public BaseResponse<MemberInfoResponseDto> show(@PathVariable("member-id") Long memberId) {
+    public BaseResponse<GetMemberResponse> show(@PathVariable("member-id") Long memberId) {
         Member member = memberService.findOneById(memberId);
         return new BaseResponse<>(memberService.getMemberInfo(member));
     }

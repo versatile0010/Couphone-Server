@@ -9,10 +9,10 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class MemberResponseDto {
+public class PatchMemberResponse {
     @Schema(example = "1", description = "회원 아이디")
     private Long id;
-    public MemberResponseDto(Member member) {
+    public PatchMemberResponse(Member member) {
         id = member.getId();
     }
 }

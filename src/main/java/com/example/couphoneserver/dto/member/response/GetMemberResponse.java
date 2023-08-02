@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class MemberInfoResponseDto {
+public class GetMemberResponse {
     @Schema(example = "1", description = "회원 아이디")
     private Long id;
     @Schema(example = "김이름", description = "회원 이름")
@@ -22,7 +22,7 @@ public class MemberInfoResponseDto {
     @Schema(example = "ACTIVE", description = "회원 상태")
     private MemberStatus memberStatus;
 
-    public MemberInfoResponseDto(Member member) {
+    public GetMemberResponse(Member member) {
         id = member.getId();
         name = member.getName();
         email = member.getEmail();
