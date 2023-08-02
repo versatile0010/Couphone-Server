@@ -4,10 +4,10 @@ import com.example.couphoneserver.common.exception.MemberException;
 import com.example.couphoneserver.domain.MemberGrade;
 import com.example.couphoneserver.domain.MemberStatus;
 import com.example.couphoneserver.domain.entity.Member;
-import com.example.couphoneserver.dto.member.request.LoginRequestDto;
-import com.example.couphoneserver.dto.member.response.LoginResponseDto;
-import com.example.couphoneserver.dto.member.response.MemberInfoResponseDto;
-import com.example.couphoneserver.dto.member.response.MemberResponseDto;
+import com.example.couphoneserver.dto.auth.LoginRequestDto;
+import com.example.couphoneserver.dto.auth.LoginResponseDto;
+import com.example.couphoneserver.dto.member.response.GetMemberResponse;
+import com.example.couphoneserver.dto.member.response.PatchMemberResponse;
 import com.example.couphoneserver.repository.MemberRepository;
 import com.example.couphoneserver.utils.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -81,9 +81,9 @@ public class MemberService {
      * 회원 탈퇴 처리
      */
     @Transactional
-    public MemberResponseDto delete(Member member) {
+    public PatchMemberResponse delete(Member member) {
         member.setTerminated();
-        return new MemberResponseDto(member);
+        return new PatchMemberResponse(member);
     }
 
     @Transactional
@@ -116,8 +116,8 @@ public class MemberService {
     /**
      * 단일 회원 정보 조회
      */
-    public MemberInfoResponseDto getMemberInfo(Member member) {
-        return new MemberInfoResponseDto(member);
+    public GetMemberResponse getMemberInfo(Member member) {
+        return new GetMemberResponse(member);
     }
 
     /**

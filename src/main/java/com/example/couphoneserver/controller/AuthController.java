@@ -2,8 +2,8 @@ package com.example.couphoneserver.controller;
 
 import com.example.couphoneserver.common.annotation.NoAuth;
 import com.example.couphoneserver.common.response.BaseResponse;
-import com.example.couphoneserver.dto.member.request.LoginRequestDto;
-import com.example.couphoneserver.dto.member.response.LoginResponseDto;
+import com.example.couphoneserver.dto.auth.LoginRequestDto;
+import com.example.couphoneserver.dto.auth.LoginResponseDto;
 import com.example.couphoneserver.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
