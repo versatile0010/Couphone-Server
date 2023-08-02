@@ -7,7 +7,7 @@ import lombok.*;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class LoginResponseDto {
-    @Schema(example = "access token (jwt) ", description = "valid time = 30 min")
+    @Schema(example = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjMTFjMjJjQG5hdmVyLmNvbSIsImF1dGgiOiJST0xFX01FTUJFUixST0xFX0FETUlOIiwidXNlcklkIjoiNSIsImlhdCI6MTY5MDkwNzUxOCwiZXhwIjoxNjkwOTA5MzE4fQ.C99Hgj_6tuC0WHpX1kMGY9IkOFPRVOwtOuA2P03iKfg", description = "valid time = 30 min")
     private String accessToken;
     @Schema(example = "jwt")
     private String tokenType;
