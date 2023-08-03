@@ -199,7 +199,7 @@ public class MemberService {
         }
         List<BrandDto> brands = coupons.stream().map(coupon -> {
             Brand brand = coupon.getBrand();
-            return new BrandDto(brand, coupon.getStampCount());
+            return new BrandDto(brand, coupon.getStampCount(), coupon.getStatus());
         }).toList();
 
         Member member = findOneById(memberId);

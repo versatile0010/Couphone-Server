@@ -1,5 +1,6 @@
 package com.example.couphoneserver.dto.member.response;
 
+import com.example.couphoneserver.domain.CouponItemStatus;
 import com.example.couphoneserver.domain.entity.Brand;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -23,12 +24,14 @@ public class BrandDto {
     @Schema(description = "스탬프 적립 개수", example = "3")
     int stampCount;
 
+    @Schema(description = "쿠폰 상태", example = "ACTIVE")
+    CouponItemStatus couponItemStatus;
     @Schema(description = "생성 시간", example = "2023-07-29 18:35:46.434060")
     LocalDateTime createdDate;
 
     @Schema(description = "만료 시간", example = "2024-01-29 18:35:46.434060")
     LocalDateTime expiredDate;
-    public BrandDto(Brand brand, int stampCount) {
+    public BrandDto(Brand brand, int stampCount, CouponItemStatus status) {
         this.id = brand.getId();
         this.name = brand.getName();
         this.rewardDescription = brand.getRewardDescription();
@@ -36,5 +39,6 @@ public class BrandDto {
         this.stampCount = stampCount;
         this.createdDate = brand.getCreatedDate();
         this.expiredDate = brand.getCreatedDate().plusMonths(6);
+        this.couponItemStatus = status;
     }
 }
