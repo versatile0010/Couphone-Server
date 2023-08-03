@@ -8,13 +8,16 @@ import com.example.couphoneserver.dto.brand.GetBrandResponse;
 import com.example.couphoneserver.dto.brand.PostBrandRequest;
 import com.example.couphoneserver.dto.brand.PostBrandResponse;
 import com.example.couphoneserver.service.BrandService;
+import com.example.couphoneserver.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 import static com.example.couphoneserver.common.response.status.BaseExceptionResponseStatus.BAD_REQUEST;
@@ -26,6 +29,7 @@ import static com.example.couphoneserver.common.response.status.BaseExceptionRes
 @RequestMapping("/brands")
 public class BrandController {
     private final BrandService brandService;
+    private final MemberService memberService;
 
     @PostMapping("")
     @Operation(summary = "브랜드 등록", description = "Request Body에 브랜드 이름, 보상 설명, 이미지 url, 카테고리 id 담아서 보내주세요!")
@@ -42,8 +46,10 @@ public class BrandController {
             security = @SecurityRequirement(name = "bearerAuth"))
     public BaseResponse<List<GetBrandResponse>> getBrand(@RequestParam(required = false, value = "category-id") Long categoryId,
                                                          @RequestParam(required = false, value = "name") String name,
-                                                         @PreAuthorize Long memberId) {
+                                                         Principal principal) {
 
+        String email = principal.getName();
+        Long memberId = memberService.findOneByEmail(email).getId();
 
         if ((categoryId != null) && (name == null)) {
             return new BaseResponse<>(brandService.findByCategoryId(memberId, categoryId));
