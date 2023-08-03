@@ -23,9 +23,8 @@ import static com.example.couphoneserver.common.response.status.BaseExceptionRes
 @Component
 @RequiredArgsConstructor
 public class CoordinateConverter {
-
-    @Value("${spring.geocoder}")
-    private String apikey;
+    //실제 환경에서는 실행이 되는데, 테스트 환경에서는 값이 주입되지 않는 상황
+    private String apikey = "F224F68F-0102-3D4D-9467-84B239E77413";
 
     private String searchType = "road";
 
