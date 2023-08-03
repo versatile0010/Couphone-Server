@@ -29,10 +29,10 @@ public class PostStoreRequest {
     @Schema(example = "서울특별시 광진구 능동로 120")
     private String address;
     @NotNull(message = "longitude: {NotNull}")
-    @Schema(example = "123456.111111")
+    @Schema(example = "207005.189144674")
     private Double longitude;
     @NotNull(message = "latitude: {NotNull}")
-    @Schema(example = "123456.111111")
+    @Schema(example = "449492.810069438")
     private Double latitude;
 
     public Store toEntity(Brand brand) {
