@@ -1,5 +1,6 @@
 package com.example.couphoneserver.controller;
 
+import com.example.couphoneserver.common.argument_resolver.PreAuthorize;
 import com.example.couphoneserver.common.exception.BadRequestException;
 import com.example.couphoneserver.common.response.BaseResponse;
 import com.example.couphoneserver.dto.brand.GetBrandDetailResponse;
@@ -8,6 +9,7 @@ import com.example.couphoneserver.dto.brand.PostBrandRequest;
 import com.example.couphoneserver.dto.brand.PostBrandResponse;
 import com.example.couphoneserver.service.BrandService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,14 +33,17 @@ public class BrandController {
         return new BaseResponse<>(brandService.saveBrand(request));
     }
 
-    @GetMapping("/{member-id}")
+    @GetMapping("")
     @Operation(summary = "브랜드 조회",
-            description = "브랜드를 검색어 또는 카테고리별로 조회합니다. Path Variable로 멤버 ID 담아서 보내주세요! " +
-            "Query String으로 카테고리 ID를 담아서 보내주시면 카테고리별로 브랜드를 조회하고, " +
-            "검색어 담아서 보내주시면 검색한 이름에 따라 브랜드를 조회합니다.")
+            description = """
+                    브랜드를 검색어 또는 카테고리별로 조회합니다. Header에 Access Token 담아주세요!
+                    Query String으로 카테고리 ID를 담아서 보내주시면 카테고리별로 브랜드를 조회하고,
+                    검색어 담아서 보내주시면 검색한 이름에 따라 브랜드를 조회합니다.""",
+            security = @SecurityRequirement(name = "bearerAuth"))
     public BaseResponse<List<GetBrandResponse>> getBrand(@RequestParam(required = false, value = "category-id") Long categoryId,
-                                                                     @RequestParam(required = false, value = "name") String name,
-                                                                     @PathVariable("member-id") Long memberId) {
+                                                         @RequestParam(required = false, value = "name") String name,
+                                                         @PreAuthorize Long memberId) {
+
 
         if ((categoryId != null) && (name == null)) {
             return new BaseResponse<>(brandService.findByCategoryId(memberId, categoryId));
