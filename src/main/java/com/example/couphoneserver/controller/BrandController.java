@@ -51,9 +51,6 @@ public class BrandController {
                                                          @RequestParam(required = false, value = "name") String name,
                                                          Principal principal) {
 
-        String email = principal.getName();
-        Long memberId = memberService.findOneByEmail(email).getId();
-
         if ((categoryId != null) && (name == null)) {
             return new BaseResponse<>(brandService.findByCategoryId(principal, categoryId));
         }
