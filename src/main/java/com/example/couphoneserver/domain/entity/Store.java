@@ -3,6 +3,7 @@ package com.example.couphoneserver.domain.entity;
 import com.example.couphoneserver.domain.StoreStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -25,4 +26,14 @@ public class Store extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "brand_id")
     private Brand brand; // 해당 매장의 브랜드
+
+    @Builder
+    public Store(String name, String address, Double longitude, Double latitude, StoreStatus status, Brand brand) {
+        this.name = name;
+        this.address = address;
+        this.longitude = longitude;
+        this.latitude = latitude;
+        this.status = status;
+        this.brand = brand;
+    }
 }
