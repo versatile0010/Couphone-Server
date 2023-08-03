@@ -18,6 +18,7 @@ import com.example.couphoneserver.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +31,8 @@ public class BrandService {
     private final CategoryRepository categoryRepository;
     private final CouponItemRepository couponItemRepository;
     private final MemberRepository memberRepository;
+
+    private final MemberService memberService;
 
     public PostBrandResponse saveBrand(PostBrandRequest request) {
         // 카테고리 존재하는지 검사
@@ -49,22 +52,25 @@ public class BrandService {
         return new PostBrandResponse(brand);
     }
 
-    public List<GetBrandResponse> findByCategoryId(Long mid, Long cid) {
+    public List<GetBrandResponse> findByCategoryId(Principal principal, Long categoryId) {
         List<GetBrandResponse> brandList = new ArrayList<>();
 
+        // 멤버 ID
+        Long memberId = findMemberIdByPrincipal(principal);
+
         // 멤버 존재하는지 검사
-        findMemberById(mid);
+        findMemberById(memberId);
 
         // 카테고리 존재하는지 검사
-        findCategoryById(cid);
+        findCategoryById(categoryId);
 
         // 카테고리로 브랜드 찾기
-        List<Brand> brands = brandRepository.findAllByCategoryId(cid)
+        List<Brand> brands = brandRepository.findAllByCategoryId(categoryId)
                 .orElseThrow(() -> new BrandException(BRAND_NOT_FOUND));
 
         for (Brand brand : brands) {
             // 쿠폰 찾기
-            CouponItem couponItem = couponItemRepository.findByMemberIdAndBrandIdAndStatusNotExpired(mid, brand.getId());
+            CouponItem couponItem = couponItemRepository.findByMemberIdAndBrandIdAndStatusNotExpired(memberId, brand.getId());
 
             if (couponItem == null) { // 해당 브랜드에 쿠폰이 없을 경우
                 brandList.add(new GetBrandResponse(brand, 0));
@@ -76,11 +82,14 @@ public class BrandService {
         return brandList;
     }
 
-    public List<GetBrandResponse> findByNameContaining(Long mid, String name) {
+    public List<GetBrandResponse> findByNameContaining(Principal principal, String name) {
         List<GetBrandResponse> brandList = new ArrayList<>();
 
+        // 멤버 ID
+        Long memberId = findMemberIdByPrincipal(principal);
+
         // 멤버 존재하는지 검사
-        findMemberById(mid);
+        findMemberById(memberId);
 
         // 검색어로 브랜드 찾기
         List<Brand> brands = brandRepository.findAllByNameContaining(name)
@@ -88,7 +97,7 @@ public class BrandService {
 
         for (Brand brand : brands) {
             // 쿠폰 찾기
-            CouponItem couponItem = couponItemRepository.findByMemberIdAndBrandIdAndStatus(mid, brand.getId(), CouponItemStatus.ACTIVE);
+            CouponItem couponItem = couponItemRepository.findByMemberIdAndBrandIdAndStatus(memberId, brand.getId(), CouponItemStatus.ACTIVE);
 
             if (couponItem == null) { // 해당 브랜드에 쿠폰이 없을 경우
                 brandList.add(new GetBrandResponse(brand, 0));
@@ -100,15 +109,18 @@ public class BrandService {
         return brandList;
     }
 
-    public GetBrandDetailResponse getBrandDetail(Long bid, Long mid) {
+    public GetBrandDetailResponse getBrandDetail(Long brandId, Principal principal) {
+        // 멤버 ID
+        Long memberId = findMemberIdByPrincipal(principal);
+
         // 멤버 존재하는지 검사
-        findMemberById(mid);
+        findMemberById(memberId);
 
         // 브랜드 존재하는지 검사
-        Brand brand = findById(bid);
+        Brand brand = findById(brandId);
 
         // 쿠폰 찾기
-        List<CouponItem> couponItems = couponItemRepository.findAllByMemberIdAndBrandId(mid, bid);
+        List<CouponItem> couponItems = couponItemRepository.findAllByMemberIdAndBrandId(memberId, brandId);
         List<GetCouponResponse> getCoupons = new ArrayList<>();
         for (CouponItem couponItem: couponItems) {
             getCoupons.add(new GetCouponResponse(couponItem));
@@ -136,5 +148,10 @@ public class BrandService {
         if (brandRepository.existsByName(name)) {
             throw new BrandException(DUPLICATE_BRAND_NAME);
         }
+    }
+
+    private Long findMemberIdByPrincipal(Principal principal) {
+        String email = principal.getName();
+        return memberService.findOneByEmail(email).getId();
     }
 }
