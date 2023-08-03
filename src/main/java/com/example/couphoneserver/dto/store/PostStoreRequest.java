@@ -1,10 +1,8 @@
 package com.example.couphoneserver.dto.store;
 
-import com.example.couphoneserver.domain.Address;
 import com.example.couphoneserver.domain.StoreStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Nullable;
-import jakarta.persistence.Embedded;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotNull;
@@ -23,9 +21,8 @@ public class PostStoreRequest {
     @Schema(example="건국대학교 서울캠퍼스",description = "브랜드 이름+공백+지점명으로 보내주세요.")
     private String name;
     @NotNull
-    @Embedded
     @Schema(example = "서울특별시 광진구 능동로 120")
-    private Address address;
+    private String address;
     @NotNull
     @Schema(example = "123456.111111")
     private Double longitude;

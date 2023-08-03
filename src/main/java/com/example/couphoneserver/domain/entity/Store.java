@@ -1,6 +1,5 @@
 package com.example.couphoneserver.domain.entity;
 
-import com.example.couphoneserver.domain.Address;
 import com.example.couphoneserver.domain.StoreStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -17,8 +16,7 @@ public class Store extends BaseTimeEntity {
     @Column(name = "store_id")
     private Long id;
     private String name;
-    @Embedded
-    private Address address; // 불필요시 제거
+    private String address;
     private Double longitude;
     private Double latitude;
 
