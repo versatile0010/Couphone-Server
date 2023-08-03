@@ -30,16 +30,18 @@ public class CouponService {
     private final BrandRepository brandRepository;
 
     public PostCouponResponse saveCoupon(PostCouponRequest request) {
+        Long mid = request.getMemberId();
+        Long bid = request.getBrandId();
+
         // 멤버 존재하는지 검사
-        Member member = findMemberById(request.getMemberId());
+        Member member = findMemberById(mid);
 
         // 브랜드 존재하는지 검사
-        Brand brand = findBrandById(request.getBrandId());
+        Brand brand = findBrandById(bid);
 
-        // 적립 가능한 쿠폰이 있을 경우
-        if (couponItemRepository.findByMemberIdAndBrandIdAndStatus(request.getMemberId(), request.getBrandId(), CouponItemStatus.INACTIVE) != null) {
+        // 적립 가능한 쿠폰 or 사용 가능한 쿠폰이 있을 경우
+        if (couponItemRepository.findByMemberIdAndBrandIdAndStatusNotExpired(mid, bid) != null) {
             throw new CouponException(DUPLICATE_COUPON_INACTIVE);
-
         }
 
         // 쿠폰 생성
@@ -57,7 +59,7 @@ public class CouponService {
         CouponItem couponItem = couponItemRepository.findById(couponId)
                 .orElseThrow(() -> new CouponException(COUPON_NOT_FOUND));
 
-        // 해당 쿠폰을 적립할 수 없는 상태일 경우
+        // 해당 쿠폰이 스탬프를 적립할 수 없는 상태일 경우
         if (couponItem.getStatus() != CouponItemStatus.INACTIVE) {
             throw new CouponException(COUPON_NOT_COLLECT);
         }
