@@ -16,9 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.example.couphoneserver.common.response.status.BaseExceptionResponseStatus.BRAND_NOT_FOUND;
 import static com.example.couphoneserver.common.response.status.BaseExceptionResponseStatus.DUPLICATE_STORE_NAME;
@@ -30,6 +28,8 @@ import static com.example.couphoneserver.common.response.status.BaseExceptionRes
 public class StoreService {
     private final StoreRepository storeRepository;
     private final BrandRepository brandRepository;
+
+    private static final int ELEMENT = 4;
 
     /*
     가게 등록
@@ -50,7 +50,15 @@ public class StoreService {
      */
     public List<PostNearbyStoreResponse> findNearbyStores(PostNearbyStoreRequest request){
         List<PostNearbyStoreResponse> storeList = getCandidateStoreList(request);
-        return null;
+        Collections.sort(storeList, new Comparator<PostNearbyStoreResponse>() {
+            @Override
+            public int compare(PostNearbyStoreResponse o1, PostNearbyStoreResponse o2) {
+                return o1.getDistance() > o2.getDistance()? 1: -1;
+            }
+        });
+        log.info(String.valueOf(storeList.size()));
+        int numOfElement = storeList.size()>=ELEMENT?ELEMENT:storeList.size();
+        return storeList.subList(0,numOfElement);
     }
 
     private List<PostNearbyStoreResponse> getCandidateStoreList(PostNearbyStoreRequest request) {
@@ -64,18 +72,18 @@ public class StoreService {
         double maxLatitude = y + radius;
         List<PostNearbyStoreResponse> StoreList = new ArrayList<>();
         storeRepository.findNearbyStores(minLongitude,maxLongitude,minLatitude,maxLatitude).stream().forEach(c -> {
+            PostNearbyStoreResponse response = c.translateResponse();
             Coordinate coordinate = c.translateCoordinate();
-            calculateDistance(x, y, coordinate);
-            StoreList.add(c.translateResponse());
+            response.setDistance(calculateDistance(x,y,coordinate));
+            StoreList.add(response);
         });
         return StoreList;
     }
 
-    private void calculateDistance(double x, double y, Coordinate coordinate) {
+    private double calculateDistance(double x, double y, Coordinate coordinate) {
         double distanceX = Math.abs(coordinate.getLongitude() - x);
         double distanceY = Math.abs(coordinate.getLatitude() - y);
-        Double distance = Math.sqrt(distanceX*distanceX+distanceY*distanceY);
-        log.info(distance.toString());
+        return Math.sqrt(distanceX*distanceX+distanceY*distanceY);
     }
 
     private void validateStoreName(PostStoreRequest postStoreRequest) {

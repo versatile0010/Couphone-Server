@@ -51,13 +51,12 @@ public class StoreController {
 
     @PostMapping("/nearby")
     @Operation(summary = "좌표 중심 가게 반환", description = "Request Body에 좌표를 담아 보내면 주변 가게 리스트를 반환합니다.")
-    public BaseResponse<PostNearbyStoreResponse> translateCoordinate(@Validated @RequestBody PostNearbyStoreRequest request,
+    public BaseResponse<List<PostNearbyStoreResponse>> translateCoordinate(@Validated @RequestBody PostNearbyStoreRequest request,
                                                                      BindingResult bindingResult){
         if (bindingResult.hasErrors()){
             throw new StoreException(INVALID_STORE_VALUE,getErrorMessages(bindingResult));
         }
-        storeService.findNearbyStores(request);
-        return new BaseResponse<>(null);
+        return new BaseResponse<>(storeService.findNearbyStores(request));
     }
 
 }
