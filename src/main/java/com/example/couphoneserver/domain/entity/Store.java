@@ -2,16 +2,16 @@ package com.example.couphoneserver.domain.entity;
 
 import com.example.couphoneserver.domain.StoreStatus;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "STORE")
+@ToString
 public class Store extends BaseTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "store_id")
@@ -36,4 +36,5 @@ public class Store extends BaseTimeEntity {
         this.status = status;
         this.brand = brand;
     }
+
 }

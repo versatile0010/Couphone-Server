@@ -1,9 +1,12 @@
 package com.example.couphoneserver.service;
 
+import com.example.couphoneserver.common.datatype.Coordinate;
 import com.example.couphoneserver.common.exception.BrandException;
 import com.example.couphoneserver.common.exception.StoreException;
 import com.example.couphoneserver.domain.entity.Brand;
 import com.example.couphoneserver.domain.entity.Store;
+import com.example.couphoneserver.dto.store.PostNearbyStoreRequest;
+import com.example.couphoneserver.dto.store.PostNearbyStoreResponse;
 import com.example.couphoneserver.dto.store.PostStoreRequest;
 import com.example.couphoneserver.dto.store.PostStoreResponse;
 import com.example.couphoneserver.repository.BrandRepository;
@@ -13,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static com.example.couphoneserver.common.response.status.BaseExceptionResponseStatus.BRAND_NOT_FOUND;
@@ -40,6 +45,39 @@ public class StoreService {
         return new PostStoreResponse(store.getId());
     }
 
+    /*
+    가게 조회
+     */
+    public List<PostNearbyStoreResponse> findNearbyStores(PostNearbyStoreRequest request){
+        List<PostNearbyStoreResponse> storeList = getCandidateStoreList(request);
+        return null;
+    }
+
+    private List<PostNearbyStoreResponse> getCandidateStoreList(PostNearbyStoreRequest request) {
+        request.setDistance();
+        double x = request.getLongitude();
+        double y = request.getLatitude();
+        double radius = request.getDistance();
+        double minLongitude = x - radius;
+        double maxLongitude = x + radius;
+        double minLatitude = y - radius;
+        double maxLatitude = y + radius;
+        List<PostNearbyStoreResponse> StoreList = new ArrayList<>();
+        storeRepository.findNearbyStores(minLongitude,maxLongitude,minLatitude,maxLatitude).stream().forEach(c -> {
+            Coordinate coordinate = c.translateCoordinate();
+            calculateDistance(x, y, coordinate);
+            StoreList.add(c.translateResponse());
+        });
+        return StoreList;
+    }
+
+    private void calculateDistance(double x, double y, Coordinate coordinate) {
+        double distanceX = Math.abs(coordinate.getLongitude() - x);
+        double distanceY = Math.abs(coordinate.getLatitude() - y);
+        Double distance = Math.sqrt(distanceX*distanceX+distanceY*distanceY);
+        log.info(distance.toString());
+    }
+
     private void validateStoreName(PostStoreRequest postStoreRequest) {
 //        log.info("[StoreService.validateStoreName]");
         if(storeRepository.existsByName(postStoreRequest.getName()))
@@ -53,7 +91,4 @@ public class StoreService {
         return brand.get();
     }
 
-    /*
-    가게 조회
-     */
 }
