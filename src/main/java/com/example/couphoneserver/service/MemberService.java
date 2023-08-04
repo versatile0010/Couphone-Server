@@ -3,11 +3,11 @@ package com.example.couphoneserver.service;
 import com.example.couphoneserver.common.exception.MemberException;
 import com.example.couphoneserver.domain.MemberGrade;
 import com.example.couphoneserver.domain.MemberStatus;
-import com.example.couphoneserver.domain.entity.Brand;
 import com.example.couphoneserver.domain.entity.CouponItem;
 import com.example.couphoneserver.domain.entity.Member;
 import com.example.couphoneserver.dto.auth.LoginRequestDto;
 import com.example.couphoneserver.dto.auth.LoginResponseDto;
+import com.example.couphoneserver.dto.brand.GetBrandResponse;
 import com.example.couphoneserver.dto.member.response.BrandDto;
 import com.example.couphoneserver.dto.member.response.GetMemberCouponBrandsResponse;
 import com.example.couphoneserver.dto.member.response.GetMemberResponse;
@@ -198,8 +198,8 @@ public class MemberService {
             }
         }
         List<BrandDto> brands = coupons.stream().map(coupon -> {
-            Brand brand = coupon.getBrand();
-            return new BrandDto(brand, coupon.getStampCount(), coupon.getStatus());
+            GetBrandResponse brandInfo = new GetBrandResponse(coupon.getBrand(), coupon.getStampCount());
+            return new BrandDto(brandInfo, coupon.getStatus());
         }).toList();
 
         Member member = findOneById(memberId);

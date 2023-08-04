@@ -21,14 +21,14 @@ public class GetMemberCouponBrandsResponse {
     @Schema(example = "ACTIVE", description = "회원 상태")
     private MemberStatus memberStatus;
     @Schema(description = "회원 정보와, 회원이 가지고 있는 쿠폰에 대한 브랜드 목록을 반환")
-    private List<BrandDto> brands;
+    private List<BrandDto> brandInfoList;
 
-    public GetMemberCouponBrandsResponse(Member member, List<BrandDto> brands) {
+    public GetMemberCouponBrandsResponse(Member member, List<BrandDto> brandsInfoList) {
         this.id = member.getId();
         this.name = member.getName();
         this.email = member.getEmail();
         this.memberGrade = member.getGrade();
         this.memberStatus = member.getStatus();
-        this.brands = brands;
+        this.brandInfoList= brandsInfoList;
     }
 }
