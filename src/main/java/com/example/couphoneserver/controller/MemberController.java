@@ -24,7 +24,7 @@ public class MemberController {
     private final MemberService memberService;
 
     @PreAuthorize("hasRole('MEMBER') or hasRole('ADMIN')")
-    @PatchMapping("/{member-id}")
+    @PatchMapping("")
     @Operation(summary = "회원 탈퇴", description =
             """
                     회원의 상태를 TERMINATED 으로 변경합니다.
@@ -39,7 +39,7 @@ public class MemberController {
     }
 
     @PreAuthorize("hasRole('MEMBER') or hasRole('ADMIN')")
-    @GetMapping("/{member-id}")
+    @GetMapping("")
     @Operation(summary = "회원 정보 조회", description =
             """
                     회원 정보를 조회합니다.
