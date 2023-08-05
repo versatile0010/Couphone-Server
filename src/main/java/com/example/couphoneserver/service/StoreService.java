@@ -3,19 +3,24 @@ package com.example.couphoneserver.service;
 import com.example.couphoneserver.common.datatype.Coordinate;
 import com.example.couphoneserver.common.exception.BrandException;
 import com.example.couphoneserver.common.exception.StoreException;
+import com.example.couphoneserver.domain.CouponItemStatus;
 import com.example.couphoneserver.domain.entity.Brand;
+import com.example.couphoneserver.domain.entity.CouponItem;
 import com.example.couphoneserver.domain.entity.Store;
+import com.example.couphoneserver.dto.brand.GetBrandResponse;
 import com.example.couphoneserver.dto.store.PostNearbyStoreRequest;
 import com.example.couphoneserver.dto.store.PostNearbyStoreResponse;
 import com.example.couphoneserver.dto.store.PostStoreRequest;
 import com.example.couphoneserver.dto.store.PostStoreResponse;
 import com.example.couphoneserver.repository.BrandRepository;
+import com.example.couphoneserver.repository.CouponItemRepository;
 import com.example.couphoneserver.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.Principal;
 import java.util.*;
 
 import static com.example.couphoneserver.common.response.status.BaseExceptionResponseStatus.BRAND_NOT_FOUND;
@@ -28,6 +33,8 @@ import static com.example.couphoneserver.common.response.status.BaseExceptionRes
 public class StoreService {
     private final StoreRepository storeRepository;
     private final BrandRepository brandRepository;
+    private final CouponItemRepository couponItemRepository;
+    private final MemberService memberService;
 
     private static final int ELEMENT = 4;
 
@@ -48,7 +55,7 @@ public class StoreService {
     /*
     가게 조회
      */
-    public List<PostNearbyStoreResponse> findNearbyStores(PostNearbyStoreRequest request){
+    public List<PostNearbyStoreResponse> findNearbyStores(Principal principal,PostNearbyStoreRequest request){
         List<PostNearbyStoreResponse> storeList = getCandidateStoreList(request);
         Collections.sort(storeList, new Comparator<PostNearbyStoreResponse>() {
             @Override
@@ -58,7 +65,14 @@ public class StoreService {
         });
         log.info(String.valueOf(storeList.size()));
         int numOfElement = storeList.size()>=ELEMENT?ELEMENT:storeList.size();
-        return storeList.subList(0,numOfElement);
+
+        List<PostNearbyStoreResponse> resultList = storeList.subList(0,numOfElement);
+
+        for (PostNearbyStoreResponse response: resultList) {
+            response.setGetBrandResponse(getGetBrandResponse(principal, response.getBrand_id()));
+        }
+
+        return resultList;
     }
 
     private List<PostNearbyStoreResponse> getCandidateStoreList(PostNearbyStoreRequest request) {
@@ -78,6 +92,27 @@ public class StoreService {
             StoreList.add(response);
         });
         return StoreList;
+    }
+
+    public GetBrandResponse getGetBrandResponse(Principal principal, Long id) {
+
+        // 멤버 ID
+//        Long memberId = findMemberIdByPrincipal(principal);
+
+        Brand brand = brandRepository.findById(id).get();
+
+        if (brand == null) throw new BrandException(BRAND_NOT_FOUND);
+
+        CouponItem couponItem = couponItemRepository.findByMemberIdAndBrandIdAndStatus(id, id, CouponItemStatus.ACTIVE);
+
+        if (couponItem == null)  // 해당 브랜드에 쿠폰이 없을 경우
+            return new GetBrandResponse(brand, 0);
+        return new GetBrandResponse(brand, couponItem.getStampCount());
+    }
+
+    private Long findMemberIdByPrincipal(Principal principal) {
+        String email = principal.getName();
+        return memberService.findOneByEmail(email).getId();
     }
 
     private double calculateDistance(double x, double y, Coordinate coordinate) {
