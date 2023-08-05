@@ -6,7 +6,6 @@ import com.example.couphoneserver.utils.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -50,13 +49,8 @@ public class SecurityConfig {
 
     // 인증 관리자 설정
     @Bean
-    public DaoAuthenticationProvider daoAuthenticationProvider() throws Exception {
-        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
-
-        daoAuthenticationProvider.setUserDetailsService(memberDetailService);
-        daoAuthenticationProvider.setPasswordEncoder(bCryptPasswordEncoder());
-
-        return daoAuthenticationProvider;
+    public CustomAuthenticationProvider customAuthenticationProvider() throws Exception {
+        return new CustomAuthenticationProvider(memberDetailService);
     }
 
     // 비밀번호 암호화 관련
