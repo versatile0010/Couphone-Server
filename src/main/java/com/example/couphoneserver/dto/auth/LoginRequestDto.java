@@ -18,4 +18,13 @@ public class LoginRequestDto {
     @Schema(example = "김이름", description = "사용자 이름")
     private String name;
 
+    @NotNull
+    @Schema(example = "admin", description = "사용자 권한", defaultValue = "member")
+    private String role = "member";
+
+    public LoginRequestDto(String email, String name){
+        this.email = email;
+        this.name = name;
+        this.role = "member";
+    }
 }

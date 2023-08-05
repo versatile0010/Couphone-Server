@@ -24,7 +24,9 @@ public class AuthController {
     @PostMapping("/login")
     @Operation(summary = "로그인(Oauth2)", description =
             """
-                    request body 에 이메일, 이름을 포함시켜서 보내주세요.
+                    request body 에 이메일, 이름, 권한(member, admin)을 포함시켜서 보내주세요.
+                    - [권한 상관 없이 동작하는 API 입니다.]
+                    - 권한의 default 값은 member 입니다.
                     access token 과 refresh token 을 반환합니다.
                     - 신규 회원이면 회원 가입 처리 후 로그인 처리합니다.
                     - 기존 회원이면 바로 로그인 처리 합니다.
