@@ -1,6 +1,7 @@
 package com.example.couphoneserver.config;
 
 import com.example.couphoneserver.service.MemberDetailService;
+import com.example.couphoneserver.service.RefreshTokenService;
 import com.example.couphoneserver.utils.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -21,6 +22,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
     private final MemberDetailService memberDetailService;
     private final JwtTokenProvider jwtProvider;
+    private final RefreshTokenService refreshTokenService;
 
     @Bean
     public WebSecurityCustomizer configure() {
@@ -33,12 +35,15 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(FormLoginConfigurer::disable)
+
+                .authorizeHttpRequests((auth) -> auth.requestMatchers("/auth/login").permitAll())
                 .authorizeHttpRequests((auth) -> auth.requestMatchers("/admin/**").hasRole("ADMIN"))
                 .authorizeHttpRequests((auth) -> auth.anyRequest().permitAll())
                 .sessionManagement(httpSecuritySessionManagementConfigurer ->
                         httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                .addFilterBefore(new TokenAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(new TokenAuthenticationFilter(jwtProvider, refreshTokenService), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtExceptionFilter(), TokenAuthenticationFilter.class);
         return http.build();
     }
 
