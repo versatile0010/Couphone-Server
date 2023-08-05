@@ -60,6 +60,7 @@ spring:
       on-profile: JPA
   jpa:
     hibernate:
+      database-platform: org.hibernate.dialect.MySQLDialect
       ddl-auto: create
     properties:
       hibernate:
