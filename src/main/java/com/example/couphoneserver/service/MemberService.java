@@ -55,10 +55,18 @@ public class MemberService {
     public void saveByEmailAndName(LoginRequestDto dto) throws UsernameNotFoundException {
         validateDuplicateMemberByEmail(dto.getEmail());
         validateDuplicateMemberByName(dto.getName());
-        memberRepository.save(
-                new Member(dto.getName(), dto.getEmail(),
-                        MemberStatus.ACTIVE, MemberGrade.ROLE_MEMBER)
-        );
+
+        if (dto.getRole().equals("admin")) {
+            memberRepository.save(
+                    new Member(dto.getName(), dto.getEmail(),
+                            MemberStatus.ACTIVE, MemberGrade.ROLE_ADMIN)
+            );
+        } else {
+            memberRepository.save(
+                    new Member(dto.getName(), dto.getEmail(),
+                            MemberStatus.ACTIVE, MemberGrade.ROLE_MEMBER)
+            );
+        }
     }
 
     public boolean isExistingMember(LoginRequestDto requestDto) throws UsernameNotFoundException {
