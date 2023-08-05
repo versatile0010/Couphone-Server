@@ -8,6 +8,8 @@ import com.example.couphoneserver.dto.store.*;
 import com.example.couphoneserver.service.StoreService;
 import com.example.couphoneserver.utils.CoordinateConverter;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,16 +45,18 @@ public class StoreController {
 
     @NoAuth
     @GetMapping("/coordinate")
-    @Operation(summary = "좌표 변환", description = "Request Body에 주소를 담아 보내면 좌표를 반환합니다.")
-    public BaseResponse<Coordinate> translateCoordinate(@RequestParam(required = true) String query){
+    @Operation(summary = "좌표 변환", description = "query string에 주소를 담아 보내면 좌표를 반환합니다.")
+    public BaseResponse<Coordinate> translateCoordinate(@Parameter(name = "query", description = "도로명주소",example = "서울특별시 광진구 능동로 111",in = ParameterIn.QUERY)
+            @RequestParam(required = true) String query){
         return new BaseResponse<>(coordinateConverter.getCoordinate(query));
     }
 
     @GetMapping("/nearby")
-    @Operation(summary = "좌표 중심 가게 반환", description = "Request Body에 좌표를 담아 보내면 주변 가게 리스트를 반환합니다.")
-    public BaseResponse<List<PostNearbyStoreResponse>> translateCoordinate(@RequestParam Double longitude,
-                                                                           @RequestParam Double latitude,
-                                                                           @RequestParam Boolean is1km,
+    @Operation(summary = "좌표 중심 가게 반환", description = "query string에 위도, 경도, 버튼 여부를 보내면 주변 가게 리스트를 반환합니다. 좌표게: epsg:5181")
+    public BaseResponse<List<PostNearbyStoreResponse>> translateCoordinate(
+            @Parameter(name = "longitude", description = "경도", example = "207005.189144674",in = ParameterIn.QUERY) @RequestParam Double longitude,
+            @Parameter(name = "latitude", description = "위도", example = "449492.810069438", in = ParameterIn.QUERY) @RequestParam Double latitude,
+            @Parameter(name = "is1km", description = "버튼 누른 경우 true", in = ParameterIn.QUERY)@RequestParam Boolean is1km,
                                                                            Principal principal){
         return new BaseResponse<>(storeService.findNearbyStores(principal,
                 LocationInfo.builder()
