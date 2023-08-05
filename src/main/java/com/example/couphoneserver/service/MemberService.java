@@ -27,6 +27,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -214,4 +215,8 @@ public class MemberService {
         return new GetMemberCouponBrandsResponse(member, brands);
     }
 
+    public Long findMemberIdByPrincipal(Principal principal) {
+        String email = principal.getName();
+        return findOneByEmail(email).getId();
+    }
 }

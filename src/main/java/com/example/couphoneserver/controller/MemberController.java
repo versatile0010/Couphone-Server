@@ -13,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+
 
 @Slf4j
 @RestController
@@ -27,10 +29,11 @@ public class MemberController {
             """
                     회원의 상태를 TERMINATED 으로 변경합니다.
                     - [ROLE_MEMBER OR ROLE_ADMIN]
-                    - path variable 로 멤버 id 담아서 보내주세요!
+                    - access token 을 반드시 포함해서 보내주세요!
                     """,
             security = @SecurityRequirement(name = "bearerAuth"))
-    public BaseResponse<PatchMemberResponse> delete(@PathVariable("member-id") Long memberId) {
+    public BaseResponse<PatchMemberResponse> delete(Principal principal) {
+        Long memberId = memberService.findMemberIdByPrincipal(principal);
         Member member = memberService.findOneById(memberId);
         return new BaseResponse<>(memberService.delete(member));
     }
@@ -41,10 +44,11 @@ public class MemberController {
             """
                     회원 정보를 조회합니다.
                     - [ROLE_MEMBER OR ROLE_ADMIN]
-                    - path variable 로 멤버 id 담아서 보내주세요!
+                    - access token 을 반드시 포함해서 보내주세요!
                     """,
             security = @SecurityRequirement(name = "bearerAuth"))
-    public BaseResponse<GetMemberResponse> show(@PathVariable("member-id") Long memberId) {
+    public BaseResponse<GetMemberResponse> show(Principal principal) {
+        Long memberId = memberService.findMemberIdByPrincipal(principal);
         Member member = memberService.findOneById(memberId);
         return new BaseResponse<>(memberService.getMemberInfo(member));
     }
