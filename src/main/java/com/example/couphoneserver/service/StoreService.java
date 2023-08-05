@@ -8,7 +8,7 @@ import com.example.couphoneserver.domain.entity.Brand;
 import com.example.couphoneserver.domain.entity.CouponItem;
 import com.example.couphoneserver.domain.entity.Store;
 import com.example.couphoneserver.dto.brand.GetBrandResponse;
-import com.example.couphoneserver.dto.store.PostNearbyStoreRequest;
+import com.example.couphoneserver.dto.store.LocationInfo;
 import com.example.couphoneserver.dto.store.PostNearbyStoreResponse;
 import com.example.couphoneserver.dto.store.PostStoreRequest;
 import com.example.couphoneserver.dto.store.PostStoreResponse;
@@ -55,7 +55,7 @@ public class StoreService {
     /*
     가게 조회
      */
-    public List<PostNearbyStoreResponse> findNearbyStores(Principal principal,PostNearbyStoreRequest request){
+    public List<PostNearbyStoreResponse> findNearbyStores(Principal principal, LocationInfo request){
         List<PostNearbyStoreResponse> storeList = getCandidateStoreList(request);
         Collections.sort(storeList, new Comparator<PostNearbyStoreResponse>() {
             @Override
@@ -75,7 +75,7 @@ public class StoreService {
         return resultList;
     }
 
-    private List<PostNearbyStoreResponse> getCandidateStoreList(PostNearbyStoreRequest request) {
+    private List<PostNearbyStoreResponse> getCandidateStoreList(LocationInfo request) {
         request.setDistance();
         double x = request.getLongitude();
         double y = request.getLatitude();
