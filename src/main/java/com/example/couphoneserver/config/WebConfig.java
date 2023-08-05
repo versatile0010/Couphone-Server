@@ -4,12 +4,14 @@ import com.example.couphoneserver.common.argument_resolver.JwtAuthHandlerArgumen
 import com.example.couphoneserver.common.interceptor.JwtAuthInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
 
+@EnableMethodSecurity(securedEnabled = true)
 @Configuration
 @RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
@@ -21,7 +23,7 @@ public class WebConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(jwtAuthenticationInterceptor)
                 .order(1)
-                .addPathPatterns("/auth", "/brands", "/users","/stores")
+                .addPathPatterns("/auth", "/brands", "/users", "/stores", "/coupons")
                 .excludePathPatterns("/auth/login");
     }
 

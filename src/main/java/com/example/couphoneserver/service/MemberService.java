@@ -27,6 +27,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -55,10 +56,18 @@ public class MemberService {
     public void saveByEmailAndName(LoginRequestDto dto) throws UsernameNotFoundException {
         validateDuplicateMemberByEmail(dto.getEmail());
         validateDuplicateMemberByName(dto.getName());
-        memberRepository.save(
-                new Member(dto.getName(), dto.getEmail(),
-                        MemberStatus.ACTIVE, MemberGrade.ROLE_MEMBER)
-        );
+
+        if (dto.getRole().equals("admin")) {
+            memberRepository.save(
+                    new Member(dto.getName(), dto.getEmail(),
+                            MemberStatus.ACTIVE, MemberGrade.ROLE_ADMIN)
+            );
+        } else {
+            memberRepository.save(
+                    new Member(dto.getName(), dto.getEmail(),
+                            MemberStatus.ACTIVE, MemberGrade.ROLE_MEMBER)
+            );
+        }
     }
 
     public boolean isExistingMember(LoginRequestDto requestDto) throws UsernameNotFoundException {
@@ -206,4 +215,8 @@ public class MemberService {
         return new GetMemberCouponBrandsResponse(member, brands);
     }
 
+    public Long findMemberIdByPrincipal(Principal principal) {
+        String email = principal.getName();
+        return findOneByEmail(email).getId();
+    }
 }
