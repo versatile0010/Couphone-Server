@@ -97,13 +97,13 @@ public class StoreService {
     public GetBrandResponse getGetBrandResponse(Principal principal, Long id) {
 
         // 멤버 ID
-//        Long memberId = findMemberIdByPrincipal(principal);
+        Long memberId = findMemberIdByPrincipal(principal);
 
         Brand brand = brandRepository.findById(id).get();
 
         if (brand == null) throw new BrandException(BRAND_NOT_FOUND);
 
-        CouponItem couponItem = couponItemRepository.findByMemberIdAndBrandIdAndStatus(id, id, CouponItemStatus.ACTIVE);
+        CouponItem couponItem = couponItemRepository.findByMemberIdAndBrandIdAndStatus(memberId, id, CouponItemStatus.ACTIVE);
 
         if (couponItem == null)  // 해당 브랜드에 쿠폰이 없을 경우
             return new GetBrandResponse(brand, 0);
