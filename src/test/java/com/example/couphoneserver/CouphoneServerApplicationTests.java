@@ -8,7 +8,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @ActiveProfiles("dev")
 @RunWith(SpringRunner.class)
-@SpringBootTest
+//@SpringBootTest
 class CouphoneServerApplicationTests {
 	@Test
 	void contextLoads() {

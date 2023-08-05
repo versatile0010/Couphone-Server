@@ -20,6 +20,7 @@ logging:
         util:
           EC2MetadataUtils: ERROR
 spring:
+  geocoder: ${GEOCODER_API_KEY}
   servlet:
     multipart:
       max-file-size: 5MB
@@ -43,7 +44,7 @@ spring:
   sql:
     init:
       platform: mysql
-      mode: never
+      mode: always
 
 ---
 spring:
@@ -59,6 +60,8 @@ spring:
     activate:
       on-profile: JPA
   jpa:
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQLDialect
     hibernate:
       ddl-auto: create
     properties:
