@@ -136,7 +136,6 @@ public class BrandService {
 
         for (Brand brand : brands) {
             // 쿠폰 찾기
-
             CouponItem couponItem = couponItemRepository.findByMemberIdAndBrandIdAndStatusNotExpired(memberId, brand.getId());
 
             if (couponItem == null) { // 해당 브랜드에 쿠폰이 없을 경우
