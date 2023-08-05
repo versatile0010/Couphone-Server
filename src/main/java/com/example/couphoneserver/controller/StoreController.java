@@ -43,14 +43,10 @@ public class StoreController {
     }
 
     @NoAuth
-    @PostMapping("/coordinate")
+    @GetMapping("/coordinate")
     @Operation(summary = "좌표 변환", description = "Request Body에 주소를 담아 보내면 좌표를 반환합니다.")
-    public BaseResponse<Coordinate> translateCoordinate(@Validated @RequestBody PostCoordinateRequest request,
-                                              BindingResult bindingResult){
-        if (bindingResult.hasErrors()){
-            throw new StoreException(INVALID_STORE_VALUE,getErrorMessages(bindingResult));
-        }
-        return new BaseResponse<>(coordinateConverter.getCoordinate(request.getAddress()));
+    public BaseResponse<Coordinate> translateCoordinate(@RequestParam(required = true) String query){
+        return new BaseResponse<>(coordinateConverter.getCoordinate(query));
     }
 
     @PostMapping("/nearby")
