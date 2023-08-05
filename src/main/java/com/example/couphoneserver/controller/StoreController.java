@@ -5,7 +5,6 @@ import com.example.couphoneserver.common.datatype.Coordinate;
 import com.example.couphoneserver.common.exception.StoreException;
 import com.example.couphoneserver.common.response.BaseResponse;
 import com.example.couphoneserver.dto.store.*;
-import com.example.couphoneserver.repository.mappingInterface.StoreInfoMapping;
 import com.example.couphoneserver.service.StoreService;
 import com.example.couphoneserver.utils.CoordinateConverter;
 import io.swagger.v3.oas.annotations.Operation;
@@ -49,15 +48,18 @@ public class StoreController {
         return new BaseResponse<>(coordinateConverter.getCoordinate(query));
     }
 
-    @PostMapping("/nearby")
+    @GetMapping("/nearby")
     @Operation(summary = "좌표 중심 가게 반환", description = "Request Body에 좌표를 담아 보내면 주변 가게 리스트를 반환합니다.")
-    public BaseResponse<List<PostNearbyStoreResponse>> translateCoordinate(@Validated @RequestBody PostNearbyStoreRequest request,
-                                                                     Principal principal,
-                                                                     BindingResult bindingResult){
-        if (bindingResult.hasErrors()){
-            throw new StoreException(INVALID_STORE_VALUE,getErrorMessages(bindingResult));
-        }
-        return new BaseResponse<>(storeService.findNearbyStores(principal,request));
+    public BaseResponse<List<PostNearbyStoreResponse>> translateCoordinate(@RequestParam Double longitude,
+                                                                           @RequestParam Double latitude,
+                                                                           @RequestParam Boolean is1km,
+                                                                           Principal principal){
+        return new BaseResponse<>(storeService.findNearbyStores(principal,
+                LocationInfo.builder()
+                .longitude(longitude)
+                .latitude(latitude)
+                .is1km(is1km)
+                .build()));
     }
 
 }
