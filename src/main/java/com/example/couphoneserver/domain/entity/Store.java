@@ -1,24 +1,23 @@
 package com.example.couphoneserver.domain.entity;
 
-import com.example.couphoneserver.domain.Address;
 import com.example.couphoneserver.domain.StoreStatus;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "STORE")
+@ToString
 public class Store extends BaseTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "store_id")
     private Long id;
     private String name;
-    @Embedded
-    private Address address; // 불필요시 제거
+    private String address;
     private Double longitude;
     private Double latitude;
 
@@ -27,4 +26,15 @@ public class Store extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "brand_id")
     private Brand brand; // 해당 매장의 브랜드
+
+    @Builder
+    public Store(String name, String address, Double longitude, Double latitude, StoreStatus status, Brand brand) {
+        this.name = name;
+        this.address = address;
+        this.longitude = longitude;
+        this.latitude = latitude;
+        this.status = status;
+        this.brand = brand;
+    }
+
 }
