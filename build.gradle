@@ -26,7 +26,6 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'mysql:mysql-connector-java:8.0.28'
 	implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0'
-	implementation 'org.projectlombok:lombok:1.18.22'
 	testImplementation 'junit:junit:4.13.1'
 	//JWT
 	implementation 'org.springframework.boot:spring-boot-starter-security'
@@ -44,6 +43,8 @@ dependencies {
 	//Marvin for image resizing
 	implementation 'com.github.downgoon:marvin:1.5.5'
 	implementation 'com.github.downgoon:MarvinPlugins:1.5.5'
+	//json
+	implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'

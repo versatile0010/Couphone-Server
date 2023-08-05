@@ -20,6 +20,7 @@ logging:
         util:
           EC2MetadataUtils: ERROR
 spring:
+  geocoder: ${GEOCODER_API_KEY}
   servlet:
     multipart:
       max-file-size: 5MB

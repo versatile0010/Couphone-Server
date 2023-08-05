@@ -53,7 +53,6 @@ public class SecurityConfig {
         return new CustomAuthenticationProvider(memberDetailService);
     }
 
-
     // 비밀번호 암호화 관련
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
