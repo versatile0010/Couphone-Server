@@ -1,4 +1,4 @@
-package com.example.couphoneserver.dto.member.response;
+package com.example.couphoneserver.dto.auth;
 
 import com.example.couphoneserver.domain.MemberGrade;
 import io.swagger.v3.oas.annotations.media.Schema;

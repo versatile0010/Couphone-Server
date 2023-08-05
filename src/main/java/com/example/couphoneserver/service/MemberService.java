@@ -3,12 +3,17 @@ package com.example.couphoneserver.service;
 import com.example.couphoneserver.common.exception.MemberException;
 import com.example.couphoneserver.domain.MemberGrade;
 import com.example.couphoneserver.domain.MemberStatus;
+import com.example.couphoneserver.domain.entity.CouponItem;
 import com.example.couphoneserver.domain.entity.Member;
-import com.example.couphoneserver.dto.member.request.AddMemberRequestDto;
-import com.example.couphoneserver.dto.member.request.LoginRequestDto;
-import com.example.couphoneserver.dto.member.response.LoginResponseDto;
-import com.example.couphoneserver.dto.member.response.MemberInfoResponseDto;
-import com.example.couphoneserver.dto.member.response.MemberResponseDto;
+import com.example.couphoneserver.dto.auth.LoginRequestDto;
+import com.example.couphoneserver.dto.auth.LoginResponseDto;
+import com.example.couphoneserver.dto.brand.GetBrandResponse;
+import com.example.couphoneserver.dto.member.response.BrandDto;
+import com.example.couphoneserver.dto.member.response.GetMemberCouponBrandsResponse;
+import com.example.couphoneserver.dto.member.response.GetMemberResponse;
+import com.example.couphoneserver.dto.member.response.PatchMemberResponse;
+import com.example.couphoneserver.repository.BrandRepository;
+import com.example.couphoneserver.repository.CouponItemRepository;
 import com.example.couphoneserver.repository.MemberRepository;
 import com.example.couphoneserver.utils.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -38,24 +43,13 @@ import static com.example.couphoneserver.common.response.status.BaseExceptionRes
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
+    private final CouponItemRepository couponItemRepository;
+
+    private final BrandRepository brandRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtTokenProvider jwtProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final RefreshTokenService refreshTokenService;
-
-    /**
-     * 이메일로 회원 가입
-     */
-    @Transactional
-    public MemberResponseDto save(AddMemberRequestDto dto) throws UsernameNotFoundException {
-        validateDuplicateMemberByEmail(dto.getEmail());
-        validateDuplicateMemberByName(dto.getName());
-        Member savedMember = memberRepository.save(
-                new Member(dto.getName(), dto.getEmail(), bCryptPasswordEncoder.encode(dto.getPassword()),
-                        MemberStatus.ACTIVE, MemberGrade.ROLE_MEMBER)
-        );
-        return new MemberResponseDto(savedMember);
-    }
 
     @Transactional
     public void saveByEmailAndName(LoginRequestDto dto) throws UsernameNotFoundException {
@@ -96,9 +90,9 @@ public class MemberService {
      * 회원 탈퇴 처리
      */
     @Transactional
-    public MemberResponseDto delete(Member member) {
+    public PatchMemberResponse delete(Member member) {
         member.setTerminated();
-        return new MemberResponseDto(member);
+        return new PatchMemberResponse(member);
     }
 
     @Transactional
@@ -131,8 +125,8 @@ public class MemberService {
     /**
      * 단일 회원 정보 조회
      */
-    public MemberInfoResponseDto getMemberInfo(Member member) {
-        return new MemberInfoResponseDto(member);
+    public GetMemberResponse getMemberInfo(Member member) {
+        return new GetMemberResponse(member);
     }
 
     /**
@@ -184,5 +178,32 @@ public class MemberService {
         return memberRepository.findMemberByEmail(email);
     }
 
+
+    public GetMemberCouponBrandsResponse getBrands(Long memberId, int option) {
+        // 회원이 가지고 있는 쿠폰의 브랜드 정보 리스트와 회원 정보를 같이 반환합니다.
+        // 이때 정렬 기준은 option 에 따라서 달라집니다. (default 는 쿠폰 많은 순, 생성시간 이른 순)
+        List<CouponItem> coupons;
+        switch (option) {
+            case 2 -> {
+                log.info("[정렬 필터 옵션2번]");
+                coupons = couponItemRepository.findByMemberIdOrderByCreatedDateAndStampCount(memberId);
+            }
+            case 3 -> {
+                log.info("[정렬 필터 옵션3번]");
+                coupons = couponItemRepository.findByMemberIdOrderByBrandName(memberId);
+            }
+            default -> {
+                log.info("[정렬 필터 옵션1번]");
+                coupons = couponItemRepository.findByMemberIdOrderByStampCountAndCreatedDate(memberId);
+            }
+        }
+        List<BrandDto> brands = coupons.stream().map(coupon -> {
+            GetBrandResponse brandInfo = new GetBrandResponse(coupon.getBrand(), coupon.getStampCount());
+            return new BrandDto(brandInfo, coupon.getStatus());
+        }).toList();
+
+        Member member = findOneById(memberId);
+        return new GetMemberCouponBrandsResponse(member, brands);
+    }
 
 }

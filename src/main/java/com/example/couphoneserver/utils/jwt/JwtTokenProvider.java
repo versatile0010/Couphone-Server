@@ -1,8 +1,10 @@
 package com.example.couphoneserver.utils.jwt;
 
 import com.example.couphoneserver.common.exception.MemberException;
+import com.example.couphoneserver.common.exception.jwt.bad_request.JwtBadRequestException;
 import com.example.couphoneserver.common.exception.jwt.bad_request.JwtNoTokenException;
 import com.example.couphoneserver.common.exception.jwt.bad_request.JwtUnsupportedTokenException;
+import com.example.couphoneserver.common.exception.jwt.unauthorized.JwtExpiredTokenException;
 import com.example.couphoneserver.common.exception.jwt.unauthorized.JwtInvalidTokenException;
 import com.example.couphoneserver.common.exception.jwt.unauthorized.JwtMalformedTokenException;
 import com.example.couphoneserver.domain.entity.RefreshToken;
@@ -160,10 +162,39 @@ public class JwtTokenProvider implements InitializingBean {
     }
 
     private Claims getClaims(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (SecurityException e) {
+            throw new JwtInvalidTokenException(INVALID_TOKEN);
+        } catch (MalformedJwtException e) {
+            throw new JwtMalformedTokenException(INVALID_TOKEN);
+        } catch (ExpiredJwtException e) {
+            throw new JwtExpiredTokenException(EXPIRED_TOKEN);
+        } catch (UnsupportedJwtException e) {
+            throw new JwtUnsupportedTokenException(UNSUPPORTED_TOKEN_TYPE);
+        } catch (IllegalArgumentException e) {
+            throw new JwtBadRequestException(JWT_ERROR);
+        }
     }
+    public Long getUserIdFromExpiredToken(String token) {
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+            return Long.parseLong(claims.get("userId", String.class));
+        } catch (ExpiredJwtException e) {
+            // 만료된 토큰에서 사용자 ID를 추출
+            // access token 이 만료되었지만 refresh token 이 존재하는 경우
+            // JwtExceptionFilter 에 의해 ExpiredException 이 처리되기 전에 userId 를 반환해야 할 때에만 사용
+            Claims expiredClaims = e.getClaims();
+            return Long.parseLong(expiredClaims.get("userId", String.class));
+        }
+    }
+
 }
