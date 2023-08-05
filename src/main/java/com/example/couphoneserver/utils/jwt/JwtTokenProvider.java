@@ -27,10 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Collection;
-import java.util.Date;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.example.couphoneserver.common.response.status.BaseExceptionResponseStatus.*;
@@ -92,15 +89,27 @@ public class JwtTokenProvider implements InitializingBean {
     }
 
     public Authentication getAuthentication(String token) {
-        Claims claims = Jwts.parserBuilder()
+        Claims claims = Jwts.parserBuilder()    // 1. token 으로부터 Claim 들을 가져온다.
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-        Collection<? extends GrantedAuthority> authorities = Arrays.asList(new SimpleGrantedAuthority("ROLE_MEMBER"), new SimpleGrantedAuthority("ROLE_ADMIN"));
 
-        User principal = new User(claims.getSubject(), "", authorities);
-        return new UsernamePasswordAuthenticationToken(principal, token, authorities);
+        String authorities = claims.get("auth", String.class);
+        // 2. 권한을 String 으로 가져온다.
+
+        log.info("현재 회원의 권한은: " + authorities);
+
+        List<String> rolesMap = Arrays.stream(authorities.split(",")).map(String::trim).toList();
+        // 3. 전처리
+
+        List<GrantedAuthority> authList = rolesMap.stream()
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
+        //4. List<GrantedAuthority> 형태로 만든다.
+
+        User principal = new User(claims.getSubject(), "", authList);
+        return new UsernamePasswordAuthenticationToken(principal, token, authList);
     }
 
     @Transactional(readOnly = true)
@@ -180,6 +189,7 @@ public class JwtTokenProvider implements InitializingBean {
             throw new JwtBadRequestException(JWT_ERROR);
         }
     }
+
     public Long getUserIdFromExpiredToken(String token) {
         try {
             Claims claims = Jwts.parserBuilder()
