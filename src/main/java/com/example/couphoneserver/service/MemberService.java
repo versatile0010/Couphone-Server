@@ -8,6 +8,7 @@ import com.example.couphoneserver.domain.entity.Member;
 import com.example.couphoneserver.dto.auth.LoginRequestDto;
 import com.example.couphoneserver.dto.auth.LoginResponseDto;
 import com.example.couphoneserver.dto.brand.GetBrandResponse;
+import com.example.couphoneserver.dto.member.request.PatchMemberPhoneNumberRequest;
 import com.example.couphoneserver.dto.member.response.BrandDto;
 import com.example.couphoneserver.dto.member.response.GetMemberCouponBrandsResponse;
 import com.example.couphoneserver.dto.member.response.GetMemberResponse;
@@ -219,5 +220,14 @@ public class MemberService {
     public Long findMemberIdByPrincipal(Principal principal) {
         String email = principal.getName();
         return findOneByEmail(email).getId();
+    }
+
+    @Transactional
+    public PatchMemberResponse setMemberPhoneNumber(PatchMemberPhoneNumberRequest request, Long memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
+        String phoneNumber = request.getPhoneNumber();
+        member.setPhoneNumber(phoneNumber);
+        return new PatchMemberResponse(member);
     }
 }

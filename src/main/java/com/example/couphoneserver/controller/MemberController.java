@@ -2,12 +2,14 @@ package com.example.couphoneserver.controller;
 
 import com.example.couphoneserver.common.response.BaseResponse;
 import com.example.couphoneserver.domain.entity.Member;
+import com.example.couphoneserver.dto.member.request.PatchMemberPhoneNumberRequest;
 import com.example.couphoneserver.dto.member.response.GetMemberCouponBrandsResponse;
 import com.example.couphoneserver.dto.member.response.GetMemberResponse;
 import com.example.couphoneserver.dto.member.response.PatchMemberResponse;
 import com.example.couphoneserver.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -71,5 +73,22 @@ public class MemberController {
             @RequestParam(required = false, defaultValue = "1", value = "sort") String sort) {
         Long memberId = memberService.findMemberIdByPrincipal(principal);
         return new BaseResponse<>(memberService.getBrands(memberId, Integer.parseInt(sort)));
+    }
+
+    @PreAuthorize("hasRole('MEMBER') or hasRole('ADMIN')")
+    @PatchMapping("/phone-number")
+    @Operation(summary = "회원의 전화번호 변경", description =
+            """
+                    회원의 전화번호를 변경/설정합니다.
+                    - [ROLE_MEMBER OR ROLE_ADMIN]
+                    - Access token 을 반드시 포함해서 보내주세요!
+                    - request body 에 phoneNumber 을 보내주세요.
+                    - 전화번호는 반드시 010-1234-1234 형태로 넘겨져야 합니다.
+                    """,
+            security = @SecurityRequirement(name = "bearerAuth"))
+    public BaseResponse<PatchMemberResponse> setPhoneNumber(Principal principal,
+                                                            @Valid @RequestBody PatchMemberPhoneNumberRequest request) {
+        Long memberId = memberService.findMemberIdByPrincipal(principal);
+        return new BaseResponse<>(memberService.setMemberPhoneNumber(request, memberId));
     }
 }
