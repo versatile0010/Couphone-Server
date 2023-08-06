@@ -23,4 +23,4 @@ INSERT INTO coupon_item (coupon_item_id, stamp_count, brand_id, created_date, me
 INSERT INTO coupon_item (coupon_item_id, stamp_count, brand_id, created_date, member_id, modified_date, status) VALUES (2, 3, 2, '2023-07-30 11:00:00', 1, '2023-07-30 11:00:00', 'EXPIRED');
 INSERT INTO coupon_item (coupon_item_id, stamp_count, brand_id, created_date, member_id, modified_date, status) VALUES (3, 4, 2, '2023-07-29 11:00:00', 1, '2023-07-30 11:00:00', 'INACTIVE');
 INSERT INTO coupon_item (coupon_item_id, stamp_count, brand_id, created_date, member_id, modified_date, status) VALUES (4, 1, 2, '2023-07-28 11:00:00', 2, '2023-07-30 11:00:00', 'INACTIVE');
-INSERT INTO coupon_item (coupon_item_id, stamp_count, brand_id, created_date, member_id, modified_date, status) VALUES (5, 10, 1, '2023-07-26 11:00:00', 2, '2023-07-30 11:00:00', 'ACTIVE');
+INSERT INTO coupon_item (coupon_item_id, stamp_count, brand_id, created_date, member_id, modified_date, status) VALUES (5, 10, 1, '2022-07-26 11:00:00', 2, '2022-07-30 11:00:00', 'ACTIVE');
