@@ -54,20 +54,22 @@ public class MemberController {
     }
 
     @PreAuthorize("hasRole('MEMBER') or hasRole('ADMIN')")
-    @GetMapping("/{member-id}/brands")
+    @GetMapping("/brands")
     @Operation(summary = "정렬 조건에 따른 브랜드 조회", description =
             """
-                    path variable 으로 member-id 를 보내면 해당 회원이 가지고 있는 쿠폰 브랜드 리스트를 반환합니다.
+                    해당 회원이 가지고 있는 쿠폰 브랜드 리스트를 반환합니다.
                     정렬 조건은 query string 으로 sort 값을 보내주세요. {1, 2, 3} 에 따라 달라집니다.
                     - [ROLE_MEMBER OR ROLE_ADMIN]
+                    - Access token 을 반드시 포함해서 보내주세요!
                     - 1(default)번 옵션은 쿠폰 많은 순, 생성 시간이 이른 순
                     - 2번 옵션은 생성 시간이 이른 순, 쿠폰 많은 순
                     - 3번 옵션은 브랜드 이름 순으로 정렬하여 데이터를 반환합니다.
                     """,
             security = @SecurityRequirement(name = "bearerAuth"))
     public BaseResponse<GetMemberCouponBrandsResponse> getBrands(
-            @PathVariable("member-id") Long memberId,
+            Principal principal,
             @RequestParam(required = false, defaultValue = "1", value = "sort") String sort) {
+        Long memberId = memberService.findMemberIdByPrincipal(principal);
         return new BaseResponse<>(memberService.getBrands(memberId, Integer.parseInt(sort)));
     }
 }
