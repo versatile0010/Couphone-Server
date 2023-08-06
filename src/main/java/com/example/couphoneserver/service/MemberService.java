@@ -105,7 +105,7 @@ public class MemberService {
     }
 
     @Transactional
-    public LoginResponseDto signIn(LoginRequestDto loginRequestDto) {
+    public LoginResponseDto signIn(LoginRequestDto loginRequestDto, String memberLabel) {
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(loginRequestDto.getEmail(), loginRequestDto.getName());
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
@@ -123,6 +123,7 @@ public class MemberService {
                 .tokenType("JWT Bearer ")
                 .memberId(member.getId())
                 .grade(member.getGrade())
+                .memberLabel(memberLabel)
                 .build();
     }
 
