@@ -4,6 +4,8 @@ import com.example.couphoneserver.domain.CouponItemStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -30,9 +32,11 @@ public class CouponItem extends BaseTimeEntity {
     public void SetBrand(Brand brand) {
         this.brand = brand;
     }
-    public void setStatus(CouponItemStatus status){
+
+    public void setStatus(CouponItemStatus status) {
         this.status = status;
     }
+
     /**
      * 스탬프 적립
      */
@@ -52,16 +56,23 @@ public class CouponItem extends BaseTimeEntity {
      */
     public void retrieveStamp() {
         int currentStampCount = this.stampCount;
-        if(currentStampCount >= 1){
+        if (currentStampCount >= 1) {
             this.stampCount = currentStampCount - 1;
         }
     }
 
 
     @Builder
-    public CouponItem(Member member, Brand brand){
+    public CouponItem(Member member, Brand brand) {
         this.member = member;
         this.brand = brand;
         this.status = CouponItemStatus.INACTIVE;
+    }
+
+    public boolean isExpired() {
+        LocalDateTime createdDateTime = this.getCreatedDate();
+        LocalDateTime expiryDateTime = createdDateTime.plusMonths(6);
+        // 만료일 이후이면 true (해당 쿠폰은 만료됨 )
+        return LocalDateTime.now().isAfter(expiryDateTime);
     }
 }
