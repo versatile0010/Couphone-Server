@@ -12,6 +12,7 @@ import com.example.couphoneserver.utils.CoordinateConverter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +41,7 @@ public class StoreController {
     @Operation(summary = "가게 등록", description = """
             Request Body에 브랜드 아이디, 매장명, 위도, 경도, 주소를 담아서 보내주세요!
             - [ROLE_ADMIN ONLY]
-            """)
+            """, security = @SecurityRequirement(name = "bearerAuth"))
     public BaseResponse<PostStoreResponse> postBrand(@Validated @RequestBody PostStoreRequest request,
                                                      BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -54,7 +55,7 @@ public class StoreController {
     @Operation(summary = "좌표 변환", description = """
             query string에 주소를 담아 보내면 좌표를 반환합니다.
             - [ROLE_ADMIN ONLY]
-            """)
+            """, security = @SecurityRequirement(name = "bearerAuth"))
     public BaseResponse<Coordinate> translateCoordinate(@Parameter(name = "query", description = "도로명주소", example = "서울특별시 광진구 능동로 111", in = ParameterIn.QUERY)
                                                         @RequestParam(required = true) String query) {
         return new BaseResponse<>(coordinateConverter.getCoordinate(query));
@@ -62,7 +63,8 @@ public class StoreController {
 
     @PreAuthorize("hasRole('MEMBER') or hasRole('ADMIN')")
     @GetMapping("/nearby")
-    @Operation(summary = "좌표 중심 가게 반환", description = "query string에 위도, 경도, 버튼 여부를 보내면 주변 가게 리스트를 반환합니다. 좌표게: epsg:5181")
+    @Operation(summary = "좌표 중심 가게 반환", description = "query string에 위도, 경도, 버튼 여부를 보내면 주변 가게 리스트를 반환합니다. 좌표게: epsg:5181",
+            security = @SecurityRequirement(name = "bearerAuth"))
     public BaseResponse<List<PostNearbyStoreResponse>> translateCoordinate(
             @Parameter(name = "longitude", description = "경도", example = "207005.189144674", in = ParameterIn.QUERY) @RequestParam Double longitude,
             @Parameter(name = "latitude", description = "위도", example = "449492.810069438", in = ParameterIn.QUERY) @RequestParam Double latitude,
