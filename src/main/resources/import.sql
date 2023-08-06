@@ -14,9 +14,9 @@ INSERT INTO brand (brand_id, category_id, created_date, modified_date, brand_ima
 INSERT INTO brand (brand_id, category_id, created_date, modified_date, brand_image_url, name, reward_description, status) VALUES (3, 1, '2023-07-30 10:00:00', '2023-07-30 10:05:00', 'https://example.com/images/brand2.jpg', '컴포즈 커피', '아이스 아메리카노 한 잔 무료 증정', 'ACTIVE');
 
 -- 샘플 데이터 생성: store 테이블
-INSERT INTO store (store_id, latitude, longitude, brand_id, created_date, modified_date, name, status, address) VALUES (1, 37.12345, -122.67890, 1, '2023-07-31 13:00:00', '2023-07-31 13:00:00',  '메가커피 건대입구점', 'ACTIVE', '서울특별시 건대입구로 1111');
-INSERT INTO store (store_id, latitude, longitude, brand_id, created_date, modified_date, name, status, address) VALUES (2, 37.12345, -110.67890, 1, '2023-07-31 13:00:00', '2023-07-31 13:00:00', '메가커피 세종대입구점', 'ACTIVE', '서울특별시 세종대입구로 2222');
-INSERT INTO store (store_id, latitude, longitude, brand_id, created_date, modified_date, name, status, address) VALUES (3, 37.12345, -100.67890, 2, '2023-07-31 13:00:00', '2023-07-31 13:00:00', '컴포즈커피 건대입구점', 'ACTIVE', '서울특별시 건대입구로 1111');
+INSERT INTO store (store_id, latitude, longitude, brand_id, created_date, modified_date, address, name, status) VALUES (1, 448095.451139153, 205901.648047968, 1, '2023-07-31 13:00:00', '2023-07-31 13:00:00', '서울특별시 광진구 자양제4동 7-25', '메가커피 건대입구점', 'ACTIVE');
+INSERT INTO store (store_id, latitude, longitude, brand_id, created_date, modified_date, address, name, status) VALUES (2, 449854.142331362, 206314.864860792, 1, '2023-07-31 13:00:00', '2023-07-31 13:00:00', '서울특별시 광진구 군자동 373-5', '메가커피 세종대입구점', 'ACTIVE');
+INSERT INTO store (store_id, latitude, longitude, brand_id, created_date, modified_date, address, name, status) VALUES (3, 449321.612722019, 206238.995849856, 2, '2023-07-31 13:00:00', '2023-07-31 13:00:00', '서울 광진구 능동로13길 30', '컴포즈커피 건대입구점', 'ACTIVE');
 
 -- 샘플 데이터 생성: coupon_item 테이블
 INSERT INTO coupon_item (coupon_item_id, stamp_count, brand_id, created_date, member_id, modified_date, status) VALUES (1, 5, 1, '2023-07-31 12:45:00', 1, '2023-07-31 12:45:00', 'INACTIVE');

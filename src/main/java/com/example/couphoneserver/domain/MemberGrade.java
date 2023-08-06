@@ -5,5 +5,15 @@ package com.example.couphoneserver.domain;
  * ROLE_ADMIN : 관리자
  */
 public enum MemberGrade {
-    ROLE_MEMBER, ROLE_ADMIN
+    ROLE_MEMBER("ROLE_MEMBER"),
+    ROLE_ADMIN("ROLE_ADMIN");
+
+    String grade;
+
+    MemberGrade(String grade) {
+        this.grade = grade;
+    }
+    public String getValue(){
+        return grade;
+    }
 }

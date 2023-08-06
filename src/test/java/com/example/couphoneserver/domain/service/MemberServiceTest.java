@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("dev")
 @RunWith(SpringRunner.class)
-//@SpringBootTest
+@SpringBootTest
 @Transactional
 public class MemberServiceTest {
     @Autowired
