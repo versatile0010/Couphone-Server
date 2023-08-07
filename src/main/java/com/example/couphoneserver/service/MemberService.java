@@ -9,10 +9,7 @@ import com.example.couphoneserver.dto.auth.LoginRequestDto;
 import com.example.couphoneserver.dto.auth.LoginResponseDto;
 import com.example.couphoneserver.dto.brand.GetBrandResponse;
 import com.example.couphoneserver.dto.member.request.PatchMemberFormRequest;
-import com.example.couphoneserver.dto.member.response.BrandDto;
-import com.example.couphoneserver.dto.member.response.GetMemberCouponBrandsResponse;
-import com.example.couphoneserver.dto.member.response.GetMemberResponse;
-import com.example.couphoneserver.dto.member.response.PatchMemberResponse;
+import com.example.couphoneserver.dto.member.response.*;
 import com.example.couphoneserver.repository.BrandRepository;
 import com.example.couphoneserver.repository.CouponItemRepository;
 import com.example.couphoneserver.repository.MemberRepository;
@@ -32,8 +29,7 @@ import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
-import static com.example.couphoneserver.common.response.status.BaseExceptionResponseStatus.DUPLICATED_MEMBER_EXCEPTION;
-import static com.example.couphoneserver.common.response.status.BaseExceptionResponseStatus.MEMBER_NOT_FOUND;
+import static com.example.couphoneserver.common.response.status.BaseExceptionResponseStatus.*;
 
 /**
  * 회원 관련 비지니스 로직
@@ -222,6 +218,11 @@ public class MemberService {
         return findOneByEmail(email).getId();
     }
 
+    public Member findMemberByPrincipal(Principal principal) {
+        String email = principal.getName();
+        return findOneByEmail(email);
+    }
+
     @Transactional
     public PatchMemberResponse setMemberPhoneNumberAndPinNumber(PatchMemberFormRequest request, Long memberId) {
         Member member = memberRepository.findById(memberId)
@@ -231,5 +232,13 @@ public class MemberService {
         member.setPhoneNumber(phoneNumber);
         member.setPassword(encodedNumber);
         return new PatchMemberResponse(member);
+    }
+
+    public PostVerifyPinResponse verifyPassword(Member member, String rawPassword) {
+        if (bCryptPasswordEncoder.matches(rawPassword, member.getPassword())) {
+            return new PostVerifyPinResponse(member);
+        } else {
+            throw new MemberException(MEMBER_PIN_NOT_MATCHED);
+        }
     }
 }

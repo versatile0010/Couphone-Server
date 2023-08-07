@@ -3,9 +3,11 @@ package com.example.couphoneserver.controller;
 import com.example.couphoneserver.common.response.BaseResponse;
 import com.example.couphoneserver.domain.entity.Member;
 import com.example.couphoneserver.dto.member.request.PatchMemberFormRequest;
+import com.example.couphoneserver.dto.member.request.PostVerifyPinRequest;
 import com.example.couphoneserver.dto.member.response.GetMemberCouponBrandsResponse;
 import com.example.couphoneserver.dto.member.response.GetMemberResponse;
 import com.example.couphoneserver.dto.member.response.PatchMemberResponse;
+import com.example.couphoneserver.dto.member.response.PostVerifyPinResponse;
 import com.example.couphoneserver.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -91,5 +93,23 @@ public class MemberController {
                                                             @Valid @RequestBody PatchMemberFormRequest request) {
         Long memberId = memberService.findMemberIdByPrincipal(principal);
         return new BaseResponse<>(memberService.setMemberPhoneNumberAndPinNumber(request, memberId));
+    }
+
+    @PreAuthorize("hasRole('MEMBER') or hasRole('ADMIN')")
+    @PostMapping("/verifyPin")
+    @Operation(summary = " 핀 번호 검증", description =
+            """
+                    회원의 핀 번호를 검증합니다.
+                    - [ROLE_MEMBER OR ROLE_ADMIN]
+                    - Access token 을 반드시 포함해서 보내주세요!
+                    - request body 에 pinNumber 를 보내주세요.
+                    - DB 에 저장된 암호화 된 PIN 번호와 매칭되는 지 확인합니다.
+                    """,
+            security = @SecurityRequirement(name = "bearerAuth"))
+    public BaseResponse<PostVerifyPinResponse> verifyPinNumber(@RequestBody PostVerifyPinRequest request,
+                                                               Principal principal) {
+        Member member = memberService.findMemberByPrincipal(principal);
+        String rawPassword = request.getPinNumber();
+        return new BaseResponse<>(memberService.verifyPassword(member, rawPassword));
     }
 }
