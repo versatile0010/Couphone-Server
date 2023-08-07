@@ -96,7 +96,7 @@ public class MemberController {
     }
 
     @PreAuthorize("hasRole('MEMBER') or hasRole('ADMIN')")
-    @PostMapping("/verifyPin")
+    @PostMapping("/validate-pin")
     @Operation(summary = " 핀 번호 검증", description =
             """
                     회원의 핀 번호를 검증합니다.
