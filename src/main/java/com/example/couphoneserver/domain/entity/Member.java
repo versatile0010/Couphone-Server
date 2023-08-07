@@ -144,4 +144,8 @@ public class Member extends BaseTimeEntity implements UserDetails {
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }

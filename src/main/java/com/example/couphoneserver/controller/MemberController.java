@@ -2,7 +2,7 @@ package com.example.couphoneserver.controller;
 
 import com.example.couphoneserver.common.response.BaseResponse;
 import com.example.couphoneserver.domain.entity.Member;
-import com.example.couphoneserver.dto.member.request.PatchMemberPhoneNumberRequest;
+import com.example.couphoneserver.dto.member.request.PatchMemberFormRequest;
 import com.example.couphoneserver.dto.member.response.GetMemberCouponBrandsResponse;
 import com.example.couphoneserver.dto.member.response.GetMemberResponse;
 import com.example.couphoneserver.dto.member.response.PatchMemberResponse;
@@ -76,19 +76,20 @@ public class MemberController {
     }
 
     @PreAuthorize("hasRole('MEMBER') or hasRole('ADMIN')")
-    @PatchMapping("/phone-number")
-    @Operation(summary = "회원의 전화번호 변경", description =
+    @PatchMapping("/form")
+    @Operation(summary = "회원의 전화번호 및 핀 번호 설정", description =
             """
-                    회원의 전화번호를 변경/설정합니다.
+                    회원의 전화번호와 핀 번호를 설정합니다.
                     - [ROLE_MEMBER OR ROLE_ADMIN]
                     - Access token 을 반드시 포함해서 보내주세요!
-                    - request body 에 phoneNumber 을 보내주세요.
+                    - request body 에 phoneNumber 와 pinNumber 를 보내주세요.
                     - 전화번호는 반드시 010-1234-1234 형태로 넘겨져야 합니다.
+                    - 핀 번호는 암호화되어 관리됩니다.
                     """,
             security = @SecurityRequirement(name = "bearerAuth"))
     public BaseResponse<PatchMemberResponse> setPhoneNumber(Principal principal,
-                                                            @Valid @RequestBody PatchMemberPhoneNumberRequest request) {
+                                                            @Valid @RequestBody PatchMemberFormRequest request) {
         Long memberId = memberService.findMemberIdByPrincipal(principal);
-        return new BaseResponse<>(memberService.setMemberPhoneNumber(request, memberId));
+        return new BaseResponse<>(memberService.setMemberPhoneNumberAndPinNumber(request, memberId));
     }
 }

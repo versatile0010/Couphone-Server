@@ -8,7 +8,7 @@ import com.example.couphoneserver.domain.entity.Member;
 import com.example.couphoneserver.dto.auth.LoginRequestDto;
 import com.example.couphoneserver.dto.auth.LoginResponseDto;
 import com.example.couphoneserver.dto.brand.GetBrandResponse;
-import com.example.couphoneserver.dto.member.request.PatchMemberPhoneNumberRequest;
+import com.example.couphoneserver.dto.member.request.PatchMemberFormRequest;
 import com.example.couphoneserver.dto.member.response.BrandDto;
 import com.example.couphoneserver.dto.member.response.GetMemberCouponBrandsResponse;
 import com.example.couphoneserver.dto.member.response.GetMemberResponse;
@@ -223,11 +223,13 @@ public class MemberService {
     }
 
     @Transactional
-    public PatchMemberResponse setMemberPhoneNumber(PatchMemberPhoneNumberRequest request, Long memberId) {
+    public PatchMemberResponse setMemberPhoneNumberAndPinNumber(PatchMemberFormRequest request, Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
         String phoneNumber = request.getPhoneNumber();
+        String encodedNumber = bCryptPasswordEncoder.encode(request.getPinNumber());
         member.setPhoneNumber(phoneNumber);
+        member.setPassword(encodedNumber);
         return new PatchMemberResponse(member);
     }
 }
