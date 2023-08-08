@@ -58,11 +58,7 @@ public class StoreService {
     가게 조회
      */
     public List<GetNearbyStoreResponse> findNearbyStores(Principal principal, LocationInfo request){
-        String address = coordinateConverter.getAddress(request.getLongitude(),request.getLatitude());
-        Coordinate coordinate = coordinateConverter.getCoordinate(address);
-        request.setLongitude(coordinate.getLongitude());
-        request.setLatitude(coordinate.getLatitude());
-        log.info(request.toString());
+        translateEPSG5181(request);
         List<GetNearbyStoreResponse> storeList = getCandidateStoreList(request);
         Collections.sort(storeList, new Comparator<GetNearbyStoreResponse>() {
             @Override
@@ -80,6 +76,13 @@ public class StoreService {
         }
 
         return resultList;
+    }
+
+    private void translateEPSG5181(LocationInfo request) {
+        String address = coordinateConverter.getAddress(request.getLongitude(), request.getLatitude());
+        Coordinate coordinate = coordinateConverter.getCoordinate(address);
+        request.setLongitude(coordinate.getLongitude());
+        request.setLatitude(coordinate.getLatitude());
     }
 
     private List<GetNearbyStoreResponse> getCandidateStoreList(LocationInfo request) {
