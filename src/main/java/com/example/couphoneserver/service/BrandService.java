@@ -1,11 +1,9 @@
 package com.example.couphoneserver.service;
 
 import com.example.couphoneserver.common.exception.*;
-import com.example.couphoneserver.domain.CouponItemStatus;
 import com.example.couphoneserver.domain.entity.Brand;
 import com.example.couphoneserver.domain.entity.Category;
 import com.example.couphoneserver.domain.entity.CouponItem;
-import com.example.couphoneserver.domain.entity.Member;
 import com.example.couphoneserver.dto.brand.GetBrandDetailResponse;
 import com.example.couphoneserver.dto.brand.GetBrandResponse;
 import com.example.couphoneserver.dto.brand.PostBrandRequest;
@@ -14,15 +12,10 @@ import com.example.couphoneserver.dto.coupon.GetCouponResponse;
 import com.example.couphoneserver.repository.BrandRepository;
 import com.example.couphoneserver.repository.CategoryRepository;
 import com.example.couphoneserver.repository.CouponItemRepository;
-import com.example.couphoneserver.repository.MemberRepository;
-import com.example.couphoneserver.utils.S3Uploader;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.security.Principal;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import static com.example.couphoneserver.common.response.status.BaseExceptionResponseStatus.*;
@@ -33,7 +26,6 @@ public class BrandService {
     private final BrandRepository brandRepository;
     private final CategoryRepository categoryRepository;
     private final CouponItemRepository couponItemRepository;
-    private final MemberRepository memberRepository;
 
     public PostBrandResponse saveBrand(PostBrandRequest request, String brandImageUrl) {
         // 카테고리 존재하는지 검사
