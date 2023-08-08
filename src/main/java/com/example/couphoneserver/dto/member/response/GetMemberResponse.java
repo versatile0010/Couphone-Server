@@ -22,11 +22,15 @@ public class GetMemberResponse {
     @Schema(example = "ACTIVE", description = "회원 상태")
     private MemberStatus memberStatus;
 
+    @Schema(example = "010-1234-1234", description = "회원 전화번호(null 이면 셋팅해주어야 합니다.)")
+    private String phoneNumber;
+
     public GetMemberResponse(Member member) {
         id = member.getId();
         name = member.getName();
         email = member.getEmail();
         memberGrade = member.getGrade();
         memberStatus = member.getStatus();
+        phoneNumber = member.getPhoneNumber();
     }
 }

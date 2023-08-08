@@ -204,7 +204,7 @@ public class MemberServiceTest {
         if (!memberService.isExistingMember(loginRequest)) {
             memberService.saveByEmailAndName(loginRequest);
         }
-        LoginResponseDto loginResponse = memberService.signIn(loginRequest);
+        LoginResponseDto loginResponse = memberService.signIn(loginRequest, "new");
 
         Member member = memberService.findOneById(loginResponse.getMemberId());
         // then
@@ -224,7 +224,7 @@ public class MemberServiceTest {
         if (!memberService.isExistingMember(loginRequest)) {
             memberService.saveByEmailAndName(loginRequest);
         }
-        LoginResponseDto loginResponse = memberService.signIn(loginRequest);
+        LoginResponseDto loginResponse = memberService.signIn(loginRequest, "new");
         Member member = memberService.findOneByEmail(email);
         // then
         assertAll(
