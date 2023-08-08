@@ -9,12 +9,13 @@ import com.example.couphoneserver.domain.entity.CouponItem;
 import com.example.couphoneserver.domain.entity.Store;
 import com.example.couphoneserver.dto.brand.GetBrandResponse;
 import com.example.couphoneserver.dto.store.LocationInfo;
-import com.example.couphoneserver.dto.store.PostNearbyStoreResponse;
+import com.example.couphoneserver.dto.store.GetNearbyStoreResponse;
 import com.example.couphoneserver.dto.store.PostStoreRequest;
 import com.example.couphoneserver.dto.store.PostStoreResponse;
 import com.example.couphoneserver.repository.BrandRepository;
 import com.example.couphoneserver.repository.CouponItemRepository;
 import com.example.couphoneserver.repository.StoreRepository;
+import com.example.couphoneserver.utils.CoordinateConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,7 @@ public class StoreService {
     private final BrandRepository brandRepository;
     private final CouponItemRepository couponItemRepository;
     private final MemberService memberService;
+    private final CoordinateConverter coordinateConverter;
 
     private static final int ELEMENT = 4;
 
@@ -55,27 +57,35 @@ public class StoreService {
     /*
     가게 조회
      */
-    public List<PostNearbyStoreResponse> findNearbyStores(Principal principal, LocationInfo request){
-        List<PostNearbyStoreResponse> storeList = getCandidateStoreList(request);
-        Collections.sort(storeList, new Comparator<PostNearbyStoreResponse>() {
+    public List<GetNearbyStoreResponse> findNearbyStores(Principal principal, LocationInfo request){
+        translateEPSG5181(request);
+        List<GetNearbyStoreResponse> storeList = getCandidateStoreList(request);
+        Collections.sort(storeList, new Comparator<GetNearbyStoreResponse>() {
             @Override
-            public int compare(PostNearbyStoreResponse o1, PostNearbyStoreResponse o2) {
+            public int compare(GetNearbyStoreResponse o1, GetNearbyStoreResponse o2) {
                 return o1.getDistance() > o2.getDistance()? 1: -1;
             }
         });
         log.info(String.valueOf(storeList.size()));
         int numOfElement = storeList.size()>=ELEMENT?ELEMENT:storeList.size();
 
-        List<PostNearbyStoreResponse> resultList = storeList.subList(0,numOfElement);
+        List<GetNearbyStoreResponse> resultList = storeList.subList(0,numOfElement);
 
-        for (PostNearbyStoreResponse response: resultList) {
+        for (GetNearbyStoreResponse response: resultList) {
             response.setGetBrandResponse(getGetBrandResponse(principal, response.getBrand_id()));
         }
 
         return resultList;
     }
 
-    private List<PostNearbyStoreResponse> getCandidateStoreList(LocationInfo request) {
+    private void translateEPSG5181(LocationInfo request) {
+        String address = coordinateConverter.getAddress(request.getLongitude(), request.getLatitude());
+        Coordinate coordinate = coordinateConverter.getCoordinate(address);
+        request.setLongitude(coordinate.getLongitude());
+        request.setLatitude(coordinate.getLatitude());
+    }
+
+    private List<GetNearbyStoreResponse> getCandidateStoreList(LocationInfo request) {
         request.setDistance();
         double x = request.getLongitude();
         double y = request.getLatitude();
@@ -84,9 +94,9 @@ public class StoreService {
         double maxLongitude = x + radius;
         double minLatitude = y - radius;
         double maxLatitude = y + radius;
-        List<PostNearbyStoreResponse> StoreList = new ArrayList<>();
+        List<GetNearbyStoreResponse> StoreList = new ArrayList<>();
         storeRepository.findNearbyStores(minLongitude,maxLongitude,minLatitude,maxLatitude).stream().forEach(c -> {
-            PostNearbyStoreResponse response = c.translateResponse();
+            GetNearbyStoreResponse response = c.translateResponse();
             Coordinate coordinate = c.translateCoordinate();
             response.setDistance(calculateDistance(x,y,coordinate));
             StoreList.add(response);

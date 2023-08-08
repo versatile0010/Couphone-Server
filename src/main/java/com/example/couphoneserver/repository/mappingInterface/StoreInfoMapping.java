@@ -1,7 +1,7 @@
 package com.example.couphoneserver.repository.mappingInterface;
 
 import com.example.couphoneserver.common.datatype.Coordinate;
-import com.example.couphoneserver.dto.store.PostNearbyStoreResponse;
+import com.example.couphoneserver.dto.store.GetNearbyStoreResponse;
 
 public interface StoreInfoMapping {
     Long getStore_id();
@@ -17,8 +17,8 @@ public interface StoreInfoMapping {
                 .build();
     }
 
-    default PostNearbyStoreResponse translateResponse(){
-        return PostNearbyStoreResponse.builder()
+    default GetNearbyStoreResponse translateResponse(){
+        return GetNearbyStoreResponse.builder()
                 .store_id(getStore_id())
                 .name(getName())
                 .brand_id(getBrand_id())

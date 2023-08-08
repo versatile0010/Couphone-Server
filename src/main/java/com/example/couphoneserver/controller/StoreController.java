@@ -4,7 +4,7 @@ import com.example.couphoneserver.common.datatype.Coordinate;
 import com.example.couphoneserver.common.exception.StoreException;
 import com.example.couphoneserver.common.response.BaseResponse;
 import com.example.couphoneserver.dto.store.LocationInfo;
-import com.example.couphoneserver.dto.store.PostNearbyStoreResponse;
+import com.example.couphoneserver.dto.store.GetNearbyStoreResponse;
 import com.example.couphoneserver.dto.store.PostStoreRequest;
 import com.example.couphoneserver.dto.store.PostStoreResponse;
 import com.example.couphoneserver.service.StoreService;
@@ -65,7 +65,7 @@ public class StoreController {
     @GetMapping("/nearby")
     @Operation(summary = "좌표 중심 가게 반환", description = "query string에 위도, 경도, 버튼 여부를 보내면 주변 가게 리스트를 반환합니다. 좌표게: epsg:5181",
             security = @SecurityRequirement(name = "bearerAuth"))
-    public BaseResponse<List<PostNearbyStoreResponse>> translateCoordinate(
+    public BaseResponse<List<GetNearbyStoreResponse>> translateCoordinate(
             @Parameter(name = "longitude", description = "경도", example = "207005.189144674", in = ParameterIn.QUERY) @RequestParam Double longitude,
             @Parameter(name = "latitude", description = "위도", example = "449492.810069438", in = ParameterIn.QUERY) @RequestParam Double latitude,
             @Parameter(name = "is1km", description = "버튼 누른 경우 true", in = ParameterIn.QUERY) @RequestParam Boolean is1km,
