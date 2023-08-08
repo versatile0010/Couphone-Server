@@ -1,6 +1,5 @@
 package com.example.couphoneserver.controller;
 
-import com.example.couphoneserver.common.annotation.NoAuth;
 import com.example.couphoneserver.common.exception.BadRequestException;
 import com.example.couphoneserver.common.exception.InternalServerErrorException;
 import com.example.couphoneserver.common.response.BaseResponse;
@@ -9,6 +8,7 @@ import com.example.couphoneserver.dto.brand.GetBrandResponse;
 import com.example.couphoneserver.dto.brand.PostBrandRequest;
 import com.example.couphoneserver.dto.brand.PostBrandResponse;
 import com.example.couphoneserver.service.BrandService;
+import com.example.couphoneserver.service.MemberService;
 import com.example.couphoneserver.utils.S3Uploader;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -33,6 +33,7 @@ import static com.example.couphoneserver.common.response.status.BaseExceptionRes
 @RequestMapping("/brands")
 public class BrandController {
     private final BrandService brandService;
+    private final MemberService memberService;
     private final S3Uploader s3Uploader;
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -57,25 +58,30 @@ public class BrandController {
 
     @PreAuthorize("hasRole('MEMBER') or hasRole('ADMIN')")
     @GetMapping("")
-    @Operation(summary = "브랜드 조회",
+    @Operation(summary = "브랜드 조회 (검색어 or 카테고리별)",
             description =
                     """
-                            브랜드를 검색어 또는 카테고리별로 조회합니다.
+                            Query String으로 카테고리 ID를 담아서 보내주시면 카테고리별로 브랜드를 조회하고, 검색어 담아서 보내주시면 검색한 이름에 따라 브랜드를 조회합니다.
+                            Header에 Access Token, Query String으로 정렬 옵션 담아주세요. 
                             - [ROLE_MEMBER OR ROLE_ADMIN]
-                            - Header에 Access Token 담아주세요!
-                            - Query String으로 카테고리 ID를 담아서 보내주시면 카테고리별로 브랜드를 조회하고, 검색어 담아서 보내주시면 검색한 이름에 따라 브랜드를 조회합니다.
+                            - 1(default): 쿠폰 많은 순, 생성 시간 빠른 순
+                            - 2: 생성 시간 빠른 순, 쿠폰 많은 순
+                            - 3: 브랜드 이름 순
                             """,
             security = @SecurityRequirement(name = "bearerAuth"))
     public BaseResponse<List<GetBrandResponse>> getBrand(@RequestParam(required = false, value = "category-id") Long categoryId,
                                                          @RequestParam(required = false, value = "name") String name,
+                                                         @RequestParam(required = false, defaultValue = "1", value = "sorted-by") int sortedBy,
                                                          Principal principal) {
 
+        Long memberId = memberService.findMemberIdByPrincipal(principal);
+
         if ((categoryId != null) && (name == null)) {
-            return new BaseResponse<>(brandService.findByCategoryId(principal, categoryId));
+            return new BaseResponse<>(brandService.findByCategoryId(memberId, categoryId, sortedBy));
         }
 
         if ((categoryId == null) && (name != null)) {
-            return new BaseResponse<>(brandService.findByNameContaining(principal, name));
+            return new BaseResponse<>(brandService.findByNameContaining(memberId, name, sortedBy));
         }
 
         throw new BadRequestException(BAD_REQUEST);
@@ -92,7 +98,7 @@ public class BrandController {
             security = @SecurityRequirement(name = "bearerAuth"))
     public BaseResponse<GetBrandDetailResponse> getBrandDetail(@PathVariable(value = "brand-id") Long brandId,
                                                                Principal principal) {
-
-        return new BaseResponse<>(brandService.getBrandDetail(brandId, principal));
+        Long memberId = memberService.findMemberIdByPrincipal(principal);
+        return new BaseResponse<>(brandService.getBrandDetail(brandId, memberId));
     }
 }
