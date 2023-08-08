@@ -21,15 +21,15 @@ public class PostBrandRequest {
     @NotNull
     private String rewardDescription;
 
-    @Schema(description = "브랜드 로고 URL", example = "----")
-    @NotNull
-    private String brandImageUrl;
+//    @Schema(description = "브랜드 로고 URL", example = "----")
+//    @NotNull
+//    private String brandImageUrl;
 
     @Schema(description = "카테고리 ID", example = "1")
     @NotNull
     private Long categoryId;
 
-    public Brand toEntity(Category category) {
+    public Brand toEntity(Category category, String brandImageUrl) {
         return Brand.builder()
                 .name(name)
                 .rewardDescription(rewardDescription)

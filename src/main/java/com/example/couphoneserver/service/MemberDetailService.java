@@ -1,9 +1,9 @@
 package com.example.couphoneserver.service;
 
 import com.example.couphoneserver.common.exception.MemberException;
-import com.example.couphoneserver.domain.entity.Member;
 import com.example.couphoneserver.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,7 @@ public class MemberDetailService implements UserDetailsService {
     private final MemberRepository memberRepository;
 
     @Override
-    public Member loadUserByUsername(String email) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         return memberRepository.findMemberByEmail(email)
                 .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
     }

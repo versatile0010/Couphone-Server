@@ -75,7 +75,10 @@ public class Member extends BaseTimeEntity implements UserDetails {
      */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_MEMBER"), new SimpleGrantedAuthority("ROLE_ADMIN"));
+        if (grade.getValue().equals("ROLE_MEMBER")) {
+            return List.of(new SimpleGrantedAuthority("ROLE_MEMBER"));
+        }
+        return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
     }
 
     /**

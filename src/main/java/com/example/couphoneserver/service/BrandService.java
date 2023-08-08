@@ -15,7 +15,9 @@ import com.example.couphoneserver.repository.BrandRepository;
 import com.example.couphoneserver.repository.CategoryRepository;
 import com.example.couphoneserver.repository.CouponItemRepository;
 import com.example.couphoneserver.repository.MemberRepository;
+import com.example.couphoneserver.utils.S3Uploader;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
@@ -34,7 +36,8 @@ public class BrandService {
 
     private final MemberService memberService;
 
-    public PostBrandResponse saveBrand(PostBrandRequest request) {
+
+    public PostBrandResponse saveBrand(PostBrandRequest request, String brandImageUrl) {
         // 카테고리 존재하는지 검사
         Category category = findCategoryById(request.getCategoryId());
 
@@ -43,7 +46,7 @@ public class BrandService {
 
 
         // 브랜드 저장
-        Brand brand = brandRepository.save(request.toEntity(category));
+        Brand brand = brandRepository.save(request.toEntity(category, brandImageUrl));
 
         if (brand == null) {
             throw new DatabaseException(DATABASE_ERROR);
@@ -53,7 +56,6 @@ public class BrandService {
     }
 
     public List<GetBrandResponse> findByCategoryId(Principal principal, Long categoryId) {
-        List<GetBrandResponse> brandList = new ArrayList<>();
 
         // 멤버 ID
         Long memberId = findMemberIdByPrincipal(principal);
@@ -68,22 +70,10 @@ public class BrandService {
         List<Brand> brands = brandRepository.findAllByCategoryId(categoryId)
                 .orElseThrow(() -> new BrandException(BRAND_NOT_FOUND));
 
-        for (Brand brand : brands) {
-            // 쿠폰 찾기
-            CouponItem couponItem = couponItemRepository.findByMemberIdAndBrandIdAndStatusNotExpired(memberId, brand.getId());
-
-            if (couponItem == null) { // 해당 브랜드에 쿠폰이 없을 경우
-                brandList.add(new GetBrandResponse(brand, 0));
-            } else { // 해당 브랜드에 쿠폰이 있을 경우
-                brandList.add(new GetBrandResponse(brand, couponItem.getStampCount()));
-            }
-        }
-
-        return brandList;
+        return getNotExpiredBrandList(memberId, brands);
     }
 
     public List<GetBrandResponse> findByNameContaining(Principal principal, String name) {
-        List<GetBrandResponse> brandList = new ArrayList<>();
 
         // 멤버 ID
         Long memberId = findMemberIdByPrincipal(principal);
@@ -95,18 +85,7 @@ public class BrandService {
         List<Brand> brands = brandRepository.findAllByNameContaining(name)
                 .orElseThrow(() -> new BrandException(BRAND_NOT_FOUND));
 
-        for (Brand brand : brands) {
-            // 쿠폰 찾기
-            CouponItem couponItem = couponItemRepository.findByMemberIdAndBrandIdAndStatus(memberId, brand.getId(), CouponItemStatus.ACTIVE);
-
-            if (couponItem == null) { // 해당 브랜드에 쿠폰이 없을 경우
-                brandList.add(new GetBrandResponse(brand, 0));
-            } else { // 해당 브랜드에 쿠폰이 있을 경우
-                brandList.add(new GetBrandResponse(brand, couponItem.getStampCount()));
-            }
-        }
-
-        return brandList;
+        return getNotExpiredBrandList(memberId, brands);
     }
 
     public GetBrandDetailResponse getBrandDetail(Long brandId, Principal principal) {
@@ -153,5 +132,22 @@ public class BrandService {
     private Long findMemberIdByPrincipal(Principal principal) {
         String email = principal.getName();
         return memberService.findOneByEmail(email).getId();
+    }
+
+    private List<GetBrandResponse> getNotExpiredBrandList(Long memberId, List<Brand> brands) {
+        List<GetBrandResponse> brandList = new ArrayList<>();
+
+        for (Brand brand : brands) {
+            // 쿠폰 찾기
+            CouponItem couponItem = couponItemRepository.findByMemberIdAndBrandIdAndStatusNotExpired(memberId, brand.getId());
+
+            if (couponItem == null) { // 해당 브랜드에 쿠폰이 없을 경우
+                brandList.add(new GetBrandResponse(brand, 0));
+            } else { // 해당 브랜드에 쿠폰이 있을 경우
+                brandList.add(new GetBrandResponse(brand, couponItem.getStampCount()));
+            }
+        }
+
+        return brandList;
     }
 }
