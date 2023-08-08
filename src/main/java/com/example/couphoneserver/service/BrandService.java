@@ -15,7 +15,9 @@ import com.example.couphoneserver.repository.BrandRepository;
 import com.example.couphoneserver.repository.CategoryRepository;
 import com.example.couphoneserver.repository.CouponItemRepository;
 import com.example.couphoneserver.repository.MemberRepository;
+import com.example.couphoneserver.utils.S3Uploader;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
@@ -34,7 +36,8 @@ public class BrandService {
 
     private final MemberService memberService;
 
-    public PostBrandResponse saveBrand(PostBrandRequest request) {
+
+    public PostBrandResponse saveBrand(PostBrandRequest request, String brandImageUrl) {
         // 카테고리 존재하는지 검사
         Category category = findCategoryById(request.getCategoryId());
 
@@ -43,7 +46,7 @@ public class BrandService {
 
 
         // 브랜드 저장
-        Brand brand = brandRepository.save(request.toEntity(category));
+        Brand brand = brandRepository.save(request.toEntity(category, brandImageUrl));
 
         if (brand == null) {
             throw new DatabaseException(DATABASE_ERROR);

@@ -1,24 +1,30 @@
 package com.example.couphoneserver.controller;
 
+import com.example.couphoneserver.common.annotation.NoAuth;
 import com.example.couphoneserver.common.exception.BadRequestException;
+import com.example.couphoneserver.common.exception.InternalServerErrorException;
 import com.example.couphoneserver.common.response.BaseResponse;
 import com.example.couphoneserver.dto.brand.GetBrandDetailResponse;
 import com.example.couphoneserver.dto.brand.GetBrandResponse;
 import com.example.couphoneserver.dto.brand.PostBrandRequest;
 import com.example.couphoneserver.dto.brand.PostBrandResponse;
 import com.example.couphoneserver.service.BrandService;
+import com.example.couphoneserver.utils.S3Uploader;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 import java.util.List;
 
 import static com.example.couphoneserver.common.response.status.BaseExceptionResponseStatus.BAD_REQUEST;
+import static com.example.couphoneserver.common.response.status.BaseExceptionResponseStatus.FILE_UPLOAD_FAILED;
 
 @Tag(name = "brands", description = "브랜드 관련 API")
 @Slf4j
@@ -27,17 +33,26 @@ import static com.example.couphoneserver.common.response.status.BaseExceptionRes
 @RequestMapping("/brands")
 public class BrandController {
     private final BrandService brandService;
+    private final S3Uploader s3Uploader;
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("")
+    @PostMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     @Operation(summary = "브랜드 등록",
             description = """
-                    Request Body에 브랜드 이름, 보상 설명, 이미지 url, 카테고리 id 담아서 보내주세요!
                     - [ROLE_ADMIN ONLY]
+                    - Header에 Access Token,
+                    - Request Body에 request: 브랜드 이름(String), 보상 설명(String), 카테고리 id(Long) / file: 이미지(MultipartFile) 담아서 보내주세요!
                     """,
             security = @SecurityRequirement(name = "bearerAuth"))
-    public BaseResponse<PostBrandResponse> postBrand(@RequestBody PostBrandRequest request) {
-        return new BaseResponse<>(brandService.saveBrand(request));
+    public BaseResponse<PostBrandResponse> postBrand(@RequestPart PostBrandRequest request, @RequestPart("file") MultipartFile multipartFile) {
+
+        String brandImageUrl = s3Uploader.upload(multipartFile);
+
+        if (brandImageUrl == null) {
+            throw new InternalServerErrorException(FILE_UPLOAD_FAILED);
+        }
+
+        return new BaseResponse<>(brandService.saveBrand(request, brandImageUrl));
     }
 
     @PreAuthorize("hasRole('MEMBER') or hasRole('ADMIN')")
