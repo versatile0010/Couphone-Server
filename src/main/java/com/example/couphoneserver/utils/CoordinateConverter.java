@@ -4,6 +4,7 @@ import com.example.couphoneserver.common.datatype.Coordinate;
 import com.example.couphoneserver.common.exception.StoreException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -28,7 +29,8 @@ public class CoordinateConverter {
 
     private String searchType = "road";
 
-    private String epsg = "epsg:5181";
+    private static final String GETCOORD = "epsg:5181";
+    private static final String GETADDRESS = "epsg:4326";
     /*
     도로명 주소 필수!
      */
@@ -36,7 +38,7 @@ public class CoordinateConverter {
 
         String searchAddr = address;
 
-        StringBuilder sb = getURL(searchAddr);
+        StringBuilder sb = getURL("getcoord",searchAddr);
 
         BufferedReader reader;
 
@@ -54,25 +56,61 @@ public class CoordinateConverter {
             String x = jspoitn.get("x").toString();
             String y = jspoitn.get("y").toString();
 
-            System.out.println(x);
-            System.out.println(y);
-
             return new Coordinate(Double.parseDouble(x),Double.parseDouble(y));
         } catch (StoreException | ParseException | IOException e) {
             throw new StoreException(COORDINATE_NOT_FOUND,e.getMessage());
         }
     }
 
-    private StringBuilder getURL(String searchAddr) {
+
+    public String getAddress(Double x, Double y){
+
+        String coordinate = x.toString()+","+y.toString();
+
+        StringBuilder sb = getURL("getAddress",coordinate);
+
+        BufferedReader reader;
+
+        try {
+            URL url = new URL(sb.toString());
+            reader = new BufferedReader(new InputStreamReader(url.openStream(), StandardCharsets.UTF_8));
+
+            JSONParser jspa = new JSONParser();
+            JSONObject jsob = (JSONObject) jspa.parse(reader);
+            JSONObject jsrs = (JSONObject) jsob.get("response");
+
+            JSONArray jsonArray = (JSONArray) jsrs.get("result");
+            JSONObject jsonfor = new JSONObject();
+
+            String address = "";
+
+            for (int i = 0; i< jsonArray.size(); i++){
+                jsonfor = (JSONObject) jsonArray.get(i);
+                address = (String) jsonfor.get("text");
+                log.info(address);
+            }
+
+            return address;
+        } catch (StoreException | ParseException | IOException e) {
+            throw new StoreException(COORDINATE_NOT_FOUND,e.getMessage());
+        }
+    }
+
+    private StringBuilder getURL(String request, String query) {
         StringBuilder sb = new StringBuilder("https://api.vworld.kr/req/address");
         sb.append("?service=address");
-        sb.append("&request=getCoord");
+        sb.append("&request="+request);
         sb.append("&format=json");
-        sb.append("&crs=" + epsg);
         sb.append("&key=" + apikey);
         sb.append("&type=" + searchType);
         sb.append("&simple=true");
-        sb.append("&address=" + URLEncoder.encode(searchAddr, StandardCharsets.UTF_8));
+        if(request.equals("getcoord")){
+            sb.append("&crs=" + GETCOORD);
+            sb.append("&address=" + URLEncoder.encode(query, StandardCharsets.UTF_8));
+            return sb;
+        }
+        sb.append("&crs=" + GETADDRESS);
+        sb.append("&point="+URLEncoder.encode(query, StandardCharsets.UTF_8));
         return sb;
     }
 }

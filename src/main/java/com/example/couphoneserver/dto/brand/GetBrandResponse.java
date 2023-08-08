@@ -23,15 +23,15 @@ public class GetBrandResponse {
     @Schema(description = "스탬프 적립 개수", example = "3")
     int stampCount;
 
-    @Schema(description = "생성 시간", example = "2023-07-29 18:35:46.434060")
+    @Schema(description = "쿠폰 생성 시간", example = "2023-07-29 18:35:46.434060")
     LocalDateTime createdDate;
 
-    public GetBrandResponse(Brand brand, int stampCount) {
+    public GetBrandResponse(Brand brand, int stampCount, LocalDateTime createdDate) {
         this.id = brand.getId();
         this.name = brand.getName();
         this.rewardDescription = brand.getRewardDescription();
         this.brandImageUrl = brand.getBrandImageUrl();
         this.stampCount = stampCount;
-        this.createdDate = brand.getCreatedDate();
+        this.createdDate = createdDate;
     }
 }
