@@ -207,7 +207,7 @@ public class MemberService {
             }
         }
         List<BrandDto> brands = coupons.stream().map(coupon -> {
-            GetBrandResponse brandInfo = new GetBrandResponse(coupon.getBrand(), coupon.getStampCount());
+            GetBrandResponse brandInfo = new GetBrandResponse(coupon.getBrand(), coupon.getStampCount(), coupon.getCreatedDate());
             return new BrandDto(brandInfo, coupon.getStatus());
         }).toList();
 

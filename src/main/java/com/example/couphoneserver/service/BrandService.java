@@ -67,7 +67,7 @@ public class BrandService {
                     .orElseThrow(() -> new BrandException(BRAND_NOT_FOUND));
         }
 
-        return getNotExpiredBrandList(memberId, brands, sortedBy);
+        return getNotExpiredBrandListByCategoryId(memberId, categoryId, brands, sortedBy);
     }
 
     public List<GetBrandResponse> findByNameContaining(Long memberId, String name, int sortedBy) {
@@ -76,7 +76,7 @@ public class BrandService {
         List<Brand> brands = brandRepository.findAllByNameContaining(name)
                 .orElseThrow(() -> new BrandException(BRAND_NOT_FOUND));
 
-        return getNotExpiredBrandList(memberId, brands, sortedBy);
+        return getNotExpiredBrandListByName(memberId, name, brands, sortedBy);
     }
 
     public GetBrandDetailResponse getBrandDetail(Long brandId, Long memberId) {
@@ -111,62 +111,96 @@ public class BrandService {
     }
 
 
-    private List<GetBrandResponse> getNotExpiredBrandList(Long memberId, List<Brand> brands, int sortedBy) {
+    private List<GetBrandResponse> getNotExpiredBrandListByCategoryId(Long memberId, Long categoryId, List<Brand> brands, int sortedBy) {
         List<GetBrandResponse> brandList = new ArrayList<>();
         List<CouponItem> couponItems;
         List<Long> brandIdx = new ArrayList<>();
 
-        System.out.println(sortedBy);
-
-        if (sortedBy == 1) {
-            // 쿠폰 찾기
-            couponItems = couponItemRepository.findByMemberIdOrderByStampCountAndCreatedDate(memberId);
-
-            // 사용자가 쿠폰을 가지고 있는 브랜드 먼저 추가
-            for (CouponItem couponItem: couponItems) {
-                brandIdx.add(couponItem.getBrand().getId());
-                brandList.add(new GetBrandResponse(couponItem.getBrand(), couponItem.getStampCount()));
-            }
-
-            // 나머지 브랜드 추가
-            for (Brand brand : brands) {
-                if (brandIdx.contains(brand.getId())) {
-                    continue;
-                }
-
-                brandList.add(new GetBrandResponse(brand, 0));
-            }
-        } else if (sortedBy == 2) {
-            // 쿠폰 찾기
-            couponItems = couponItemRepository.findByMemberIdOrderByCreatedDateAndStampCount(memberId);
-
-            // 사용자가 쿠폰을 가지고 있는 브랜드 먼저 추가
-            for (CouponItem couponItem: couponItems) {
-                brandIdx.add(couponItem.getBrand().getId());
-                brandList.add(new GetBrandResponse(couponItem.getBrand(), couponItem.getStampCount()));
-            }
-
-            // 나머지 브랜드 추가
-            for (Brand brand : brands) {
-                if (brandIdx.contains(brand.getId())) {
-                    continue;
-                }
-
-                brandList.add(new GetBrandResponse(brand, 0));
-            }
-        } else {
+        if (sortedBy == 3) {
             for (Brand brand : brands) {
                 // 쿠폰 찾기
                 CouponItem couponItem = couponItemRepository.findByMemberIdAndBrandIdAndStatusNotExpired(memberId, brand.getId());
 
                 if (couponItem == null) {
-                    brandList.add(new GetBrandResponse(brand, 0));
+                    brandList.add(new GetBrandResponse(brand, 0, null));
                 } else {
-                    brandList.add(new GetBrandResponse(brand, couponItem.getStampCount()));
+                    brandList.add(new GetBrandResponse(brand, couponItem.getStampCount(), couponItem.getCreatedDate()));
                 }
+            }
+        } else {
+            // 쿠폰 찾기
+            couponItems = (sortedBy == 1)? couponItemRepository.findByMemberIdOrderByStampCountAndCreatedDate(memberId)
+                    : couponItemRepository.findByMemberIdOrderByCreatedDateAndStampCount(memberId);
+
+            // 사용자가 쿠폰을 가지고 있는 브랜드 먼저 추가
+            for (CouponItem couponItem: couponItems) {
+                if (getCategoryIdByCouponItem(couponItem) != categoryId) {
+                    continue;
+                }
+                brandIdx.add(couponItem.getBrand().getId());
+                brandList.add(new GetBrandResponse(couponItem.getBrand(), couponItem.getStampCount(), couponItem.getCreatedDate()));
+            }
+
+            // 나머지 브랜드 추가
+            for (Brand brand : brands) {
+                if (brandIdx.contains(brand.getId())) {
+                    continue;
+                }
+
+                brandList.add(new GetBrandResponse(brand, 0, null));
             }
         }
 
         return brandList;
+    }
+
+    private List<GetBrandResponse> getNotExpiredBrandListByName(Long memberId, String name, List<Brand> brands, int sortedBy) {
+        List<GetBrandResponse> brandList = new ArrayList<>();
+        List<CouponItem> couponItems;
+        List<Long> brandIdx = new ArrayList<>();
+
+        if (sortedBy == 3) {
+            for (Brand brand : brands) {
+                // 쿠폰 찾기
+                CouponItem couponItem = couponItemRepository.findByMemberIdAndBrandIdAndStatusNotExpired(memberId, brand.getId());
+
+                if (couponItem == null) {
+                    brandList.add(new GetBrandResponse(brand, 0, null));
+                } else {
+                    brandList.add(new GetBrandResponse(brand, couponItem.getStampCount(), couponItem.getCreatedDate()));
+                }
+            }
+        } else {
+            // 쿠폰 찾기
+            couponItems = (sortedBy == 1) ? couponItemRepository.findByMemberIdOrderByStampCountAndCreatedDate(memberId)
+                    : couponItemRepository.findByMemberIdOrderByCreatedDateAndStampCount(memberId);
+
+            // 사용자가 쿠폰을 가지고 있는 브랜드 먼저 추가
+            for (CouponItem couponItem : couponItems) {
+                if (!getBrandNameByCouponItem(couponItem).contains(name)) {
+                    continue;
+                }
+                brandIdx.add(couponItem.getBrand().getId());
+                brandList.add(new GetBrandResponse(couponItem.getBrand(), couponItem.getStampCount(), couponItem.getCreatedDate()));
+            }
+
+            // 나머지 브랜드 추가
+            for (Brand brand : brands) {
+                if (brandIdx.contains(brand.getId())) {
+                    continue;
+                }
+
+                brandList.add(new GetBrandResponse(brand, 0, null));
+            }
+        }
+        return brandList;
+    }
+
+    private Long getCategoryIdByCouponItem(CouponItem couponItem) {
+        return couponItem.getBrand().getCategory().getId();
+    }
+
+    private String getBrandNameByCouponItem(CouponItem couponItem) {
+        return couponItem.getBrand().getName();
     }
 }

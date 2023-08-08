@@ -106,8 +106,8 @@ public class StoreService {
         CouponItem couponItem = couponItemRepository.findByMemberIdAndBrandIdAndStatus(memberId, id, CouponItemStatus.ACTIVE);
 
         if (couponItem == null)  // 해당 브랜드에 쿠폰이 없을 경우
-            return new GetBrandResponse(brand, 0);
-        return new GetBrandResponse(brand, couponItem.getStampCount());
+            return new GetBrandResponse(brand, 0, null);
+        return new GetBrandResponse(brand, couponItem.getStampCount(), couponItem.getCreatedDate());
     }
 
     private Long findMemberIdByPrincipal(Principal principal) {
