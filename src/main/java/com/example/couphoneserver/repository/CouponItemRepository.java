@@ -13,10 +13,10 @@ public interface CouponItemRepository extends JpaRepository<CouponItem, Long> {
     CouponItem findByMemberIdAndBrandIdAndStatus(Long mid, Long bid, CouponItemStatus status);
 
     @Query("select c from CouponItem c " +
-    "where c.brand.id = :bid and c.member.id = :mid " +
-    "and c.status <> 'EXPIRED' " +
-    "ORDER BY c.stampCount DESC, c.createdDate ASC")
+            "where c.brand.id = :bid and c.member.id = :mid " +
+            "and c.status <> 'EXPIRED'")
     CouponItem findByMemberIdAndBrandIdAndStatusNotExpired(@Param("mid") Long mid, @Param("bid") Long bid);
+
 
     List<CouponItem> findAllByMemberIdAndBrandId(Long mid, Long bid);
 
