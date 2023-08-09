@@ -9,6 +9,7 @@ public interface StoreInfoMapping {
     Double getLongitude();
     Double getLatitude();
     Long getBrand_id();
+    String getAddress();
 
     default Coordinate translateCoordinate(){
         return Coordinate.builder()
@@ -22,6 +23,9 @@ public interface StoreInfoMapping {
                 .store_id(getStore_id())
                 .name(getName())
                 .brand_id(getBrand_id())
+                .latitude(getLatitude())
+                .longitude(getLongitude())
+                .address(getAddress())
                 .build();
     }
 }

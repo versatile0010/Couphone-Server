@@ -66,7 +66,6 @@ public class StoreService {
                 return o1.getDistance() > o2.getDistance()? 1: -1;
             }
         });
-        log.info(String.valueOf(storeList.size()));
         int numOfElement = storeList.size()>=ELEMENT?ELEMENT:storeList.size();
 
         List<GetNearbyStoreResponse> resultList = storeList.subList(0,numOfElement);
@@ -99,6 +98,7 @@ public class StoreService {
             GetNearbyStoreResponse response = c.translateResponse();
             Coordinate coordinate = c.translateCoordinate();
             response.setDistance(calculateDistance(x,y,coordinate));
+            log.info(response.toString());
             StoreList.add(response);
         });
         return StoreList;

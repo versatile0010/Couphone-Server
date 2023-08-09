@@ -1,5 +1,6 @@
 package com.example.couphoneserver.controller;
 
+import com.example.couphoneserver.common.annotation.NoAuth;
 import com.example.couphoneserver.common.datatype.Coordinate;
 import com.example.couphoneserver.common.exception.StoreException;
 import com.example.couphoneserver.common.response.BaseResponse;
@@ -61,7 +62,8 @@ public class StoreController {
         return new BaseResponse<>(coordinateConverter.getCoordinate(query));
     }
 
-    @PreAuthorize("hasRole('MEMBER') or hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('MEMBER') or hasRole('ADMIN')")
+    @NoAuth
     @GetMapping("/nearby")
     @Operation(summary = "좌표 중심 가게 반환", description = "query string에 위도, 경도, 버튼 여부를 보내면 주변 가게 리스트를 반환합니다. 좌표게: epsg:5181",
             security = @SecurityRequirement(name = "bearerAuth"))
