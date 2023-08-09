@@ -31,7 +31,6 @@ import static com.example.couphoneserver.common.response.status.BaseExceptionRes
 public class StoreService {
     private final StoreRepository storeRepository;
     private final BrandRepository brandRepository;
-    private final CouponItemRepository couponItemRepository;
     private final MemberService memberService;
     private final CoordinateConverter coordinateConverter;
 
@@ -112,11 +111,14 @@ public class StoreService {
                 }
             });
             int i = 0;
-            while(storeList.size() <= 10 || i >= tempList.size()) {
-                storeList.add(tempList.get(i));
-                log.info(tempList.get(i).toString());
-                i++;
-            }
+            try{
+                while(storeList.size() <= 10) {
+                    storeList.add(tempList.get(i));
+                    log.info(tempList.get(i).toString());
+                    i++;
+                }
+            }catch (IndexOutOfBoundsException e){}
+
         }
         return storeList;
     }

@@ -44,6 +44,7 @@ public enum BaseExceptionResponseStatus implements ResponseStatus {
      */
     DUPLICATED_MEMBER_EXCEPTION(5000, HttpStatus.BAD_REQUEST.value(), "중복된 회원 값 입니다."),
     MEMBER_NOT_FOUND(5001, HttpStatus.BAD_REQUEST.value(), "회원을 찾을 수 없습니다."),
+    MEMBER_PIN_NOT_MATCHED(5002, HttpStatus.UNAUTHORIZED.value(), "핀 번호 검증에 실패하였습니다."),
 
     /**
      * 6000: 카테고리 오류

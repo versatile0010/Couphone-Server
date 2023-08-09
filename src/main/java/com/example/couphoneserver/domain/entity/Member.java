@@ -140,4 +140,12 @@ public class Member extends BaseTimeEntity implements UserDetails {
     public void setGrade(MemberGrade grade) {
         this.grade = grade;
     }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }
