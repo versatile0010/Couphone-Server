@@ -16,6 +16,9 @@ import com.example.couphoneserver.repository.MemberRepository;
 import com.example.couphoneserver.utils.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -26,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -186,31 +190,25 @@ public class MemberService {
     }
 
 
-    public GetMemberCouponBrandsResponse getBrands(Long memberId, int option) {
-        // 회원이 가지고 있는 쿠폰의 브랜드 정보 리스트와 회원 정보를 같이 반환합니다.
-        // 이때 정렬 기준은 option 에 따라서 달라집니다. (default 는 쿠폰 많은 순, 생성시간 이른 순)
+    public GetCouponBrandsResponse getBrands(Long memberId) {
         List<CouponItem> coupons;
-        switch (option) {
-            case 2 -> {
-                log.info("[정렬 필터 옵션2번]");
-                coupons = couponItemRepository.findByMemberIdOrderByCreatedDateAndStampCount(memberId);
-            }
-            case 3 -> {
-                log.info("[정렬 필터 옵션3번]");
-                coupons = couponItemRepository.findByMemberIdOrderByBrandName(memberId);
-            }
-            default -> {
-                log.info("[정렬 필터 옵션1번]");
-                coupons = couponItemRepository.findByMemberIdOrderByStampCountAndCreatedDate(memberId);
-            }
-        }
+        log.info("[정렬 필터 옵션1번]");
+        Pageable pageable = PageRequest.of(0, 10);
+        coupons = couponItemRepository.findByMemberIdOrderByStampCountAndModifiedDate(memberId,pageable);
+
         List<BrandDto> brands = coupons.stream().map(coupon -> {
             GetBrandResponse brandInfo = new GetBrandResponse(coupon.getBrand(), coupon.getStampCount(), coupon.getCreatedDate());
             return new BrandDto(brandInfo, coupon.getStatus());
         }).toList();
 
-        Member member = findOneById(memberId);
-        return new GetMemberCouponBrandsResponse(member, brands);
+        List<BrandDto> brandsByTotalCount = new ArrayList<>();
+        couponItemRepository.findByMemberIdOrderByTotalAndStampCount(memberId).stream().forEach(
+                couponMapping -> {
+                    brandsByTotalCount.add(couponMapping.translateBrandDto());
+                }
+        );
+
+        return new GetCouponBrandsResponse(brands, brandsByTotalCount);
     }
 
     public Long findMemberIdByPrincipal(Principal principal) {

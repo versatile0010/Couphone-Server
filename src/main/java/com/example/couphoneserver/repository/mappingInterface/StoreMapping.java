@@ -17,7 +17,6 @@ public interface StoreMapping {
     String getReward_description();
     String getBrand_image_url();
     LocalDateTime getCreated_date();
-    Integer getStamp_Count();
 
     default Coordinate translateCoordinate(){
         return Coordinate.builder()

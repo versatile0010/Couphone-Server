@@ -4,7 +4,7 @@ import com.example.couphoneserver.common.response.BaseResponse;
 import com.example.couphoneserver.domain.entity.Member;
 import com.example.couphoneserver.dto.member.request.PatchMemberFormRequest;
 import com.example.couphoneserver.dto.member.request.PostVerifyPinRequest;
-import com.example.couphoneserver.dto.member.response.GetMemberCouponBrandsResponse;
+import com.example.couphoneserver.dto.member.response.GetCouponBrandsResponse;
 import com.example.couphoneserver.dto.member.response.GetMemberResponse;
 import com.example.couphoneserver.dto.member.response.PatchMemberResponse;
 import com.example.couphoneserver.dto.member.response.PostVerifyPinResponse;
@@ -65,16 +65,14 @@ public class MemberController {
                     정렬 조건은 query string 으로 sort 값을 보내주세요. {1, 2, 3} 에 따라 달라집니다.
                     - [ROLE_MEMBER OR ROLE_ADMIN]
                     - Access token 을 반드시 포함해서 보내주세요!
-                    - 1(default)번 옵션은 쿠폰 많은 순, 생성 시간이 이른 순
+                    - 1(default)번 옵션은 수정시간 빠른 순, 쿠폰 많은 순
                     - 2번 옵션은 생성 시간이 이른 순, 쿠폰 많은 순
-                    - 3번 옵션은 브랜드 이름 순으로 정렬하여 데이터를 반환합니다.
                     """,
             security = @SecurityRequirement(name = "bearerAuth"))
-    public BaseResponse<GetMemberCouponBrandsResponse> getBrands(
-            Principal principal,
-            @RequestParam(required = false, defaultValue = "1", value = "sort") String sort) {
+    public BaseResponse<GetCouponBrandsResponse> getBrands(
+            Principal principal) {
         Long memberId = memberService.findMemberIdByPrincipal(principal);
-        return new BaseResponse<>(memberService.getBrands(memberId, Integer.parseInt(sort)));
+        return new BaseResponse<>(memberService.getBrands(memberId));
     }
 
     @PreAuthorize("hasRole('MEMBER') or hasRole('ADMIN')")
