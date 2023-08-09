@@ -10,7 +10,6 @@ import com.example.couphoneserver.dto.auth.LoginResponseDto;
 import com.example.couphoneserver.dto.brand.GetBrandResponse;
 import com.example.couphoneserver.dto.member.request.PatchMemberFormRequest;
 import com.example.couphoneserver.dto.member.response.*;
-import com.example.couphoneserver.repository.BrandRepository;
 import com.example.couphoneserver.repository.CouponItemRepository;
 import com.example.couphoneserver.repository.MemberRepository;
 import com.example.couphoneserver.utils.jwt.JwtTokenProvider;
@@ -18,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -47,7 +45,6 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final CouponItemRepository couponItemRepository;
 
-    private final BrandRepository brandRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtTokenProvider jwtProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;

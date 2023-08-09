@@ -10,7 +10,6 @@ import com.example.couphoneserver.dto.store.LocationInfo;
 import com.example.couphoneserver.dto.store.PostStoreRequest;
 import com.example.couphoneserver.dto.store.PostStoreResponse;
 import com.example.couphoneserver.repository.BrandRepository;
-import com.example.couphoneserver.repository.CouponItemRepository;
 import com.example.couphoneserver.repository.StoreRepository;
 import com.example.couphoneserver.utils.CoordinateConverter;
 import lombok.RequiredArgsConstructor;
@@ -112,7 +111,7 @@ public class StoreService {
             });
             int i = 0;
             try{
-                while(storeList.size() <= 10) {
+                while(storeList.size() <= ELEMENT) {
                     storeList.add(tempList.get(i));
                     log.info(tempList.get(i).toString());
                     i++;
