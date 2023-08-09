@@ -11,7 +11,6 @@ import com.example.couphoneserver.dto.store.PostStoreRequest;
 import com.example.couphoneserver.dto.store.PostStoreResponse;
 import com.example.couphoneserver.repository.BrandRepository;
 import com.example.couphoneserver.repository.StoreRepository;
-import com.example.couphoneserver.utils.CoordinateConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,10 +30,6 @@ public class StoreService {
     private final StoreRepository storeRepository;
     private final BrandRepository brandRepository;
     private final MemberService memberService;
-    private final CoordinateConverter coordinateConverter;
-
-    private static final int ELEMENT = 10;
-
     /*
     가게 등록
      */
@@ -53,29 +48,26 @@ public class StoreService {
     가게 조회
      */
     public List<GetNearbyStoreResponse> findNearbyStores(Principal principal, LocationInfo request){
-        translateEPSG5181(request);
+//        translateEPSG5181(request);
         Long memberId = findMemberIdByPrincipal(principal);
         List<GetNearbyStoreResponse> storeList =new ArrayList<>(getCandidateStoreList(request, memberId));
-        Collections.sort(storeList, new Comparator<GetNearbyStoreResponse>() {
-            @Override
-            public int compare(GetNearbyStoreResponse o1, GetNearbyStoreResponse o2) {
-                int o1Stamp = o1.getGetBrandResponse().getStampCount();
-                int o2Stamp = o2.getGetBrandResponse().getStampCount();
+        storeList.sort((o1, o2) -> {
+            int o1Stamp = o1.getGetBrandResponse().getStampCount();
+            int o2Stamp = o2.getGetBrandResponse().getStampCount();
 
-                if (o1Stamp < o2Stamp) return 1;
-                if (o1Stamp == o2Stamp && o1.getDistance() > o2.getDistance()) return 1;
-                return -1;
-            }
+            if (o1Stamp < o2Stamp) return 1;
+            if (o1Stamp == o2Stamp && o1.getDistance() > o2.getDistance()) return 1;
+            return -1;
         });
         return storeList;
     }
 
-    private void translateEPSG5181(LocationInfo request) {
-        String address = coordinateConverter.getAddress(request.getLongitude(), request.getLatitude());
-        Coordinate coordinate = coordinateConverter.getCoordinate(address);
-        request.setLongitude(coordinate.getLongitude());
-        request.setLatitude(coordinate.getLatitude());
-    }
+//    private void translateEPSG5181(LocationInfo request) {
+//        String address = coordinateConverter.getAddress(request.getLongitude(), request.getLatitude());
+//        Coordinate coordinate = coordinateConverter.getCoordinate(address);
+//        request.setLongitude(coordinate.getLongitude());
+//        request.setLatitude(coordinate.getLatitude());
+//    }
 
     private Set<GetNearbyStoreResponse> getCandidateStoreList(LocationInfo request, Long memberId) {
         request.setDistance();
@@ -103,21 +95,8 @@ public class StoreService {
                 response.setDistance(calculateDistance(x,y,coordinate));
                 tempList.add(response);
             });
-            Collections.sort(tempList, new Comparator<GetNearbyStoreResponse>() {
-                @Override
-                public int compare(GetNearbyStoreResponse o1, GetNearbyStoreResponse o2) {
-                    return o1.getDistance() > o2.getDistance()? 1: -1;
-                }
-            });
-            int i = 0;
-            try{
-                while(storeList.size() <= ELEMENT) {
-                    storeList.add(tempList.get(i));
-                    log.info(tempList.get(i).toString());
-                    i++;
-                }
-            }catch (IndexOutOfBoundsException e){}
-
+            tempList.sort((o1, o2) -> o1.getDistance() > o2.getDistance() ? 1 : -1);
+            storeList.addAll(tempList);
         }
         return storeList;
     }
