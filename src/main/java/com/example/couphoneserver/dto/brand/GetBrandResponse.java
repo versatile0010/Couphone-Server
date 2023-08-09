@@ -2,11 +2,14 @@ package com.example.couphoneserver.dto.brand;
 
 import com.example.couphoneserver.domain.entity.Brand;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 
 @Getter
+@ToString
 public class GetBrandResponse {
     @Schema(description = "브랜드 ID", example = "1")
     Long id;
@@ -26,6 +29,7 @@ public class GetBrandResponse {
     @Schema(description = "생성 시간", example = "2023-07-29 18:35:46.434060")
     LocalDateTime createdDate;
 
+
     public GetBrandResponse(Brand brand, int stampCount) {
         this.id = brand.getId();
         this.name = brand.getName();
@@ -33,5 +37,15 @@ public class GetBrandResponse {
         this.brandImageUrl = brand.getBrandImageUrl();
         this.stampCount = stampCount;
         this.createdDate = brand.getCreatedDate();
+    }
+
+    @Builder
+    public GetBrandResponse(Long id, String name, String rewardDescription, String brandImageUrl, int stampCount, LocalDateTime createdDate) {
+        this.id = id;
+        this.name = name;
+        this.rewardDescription = rewardDescription;
+        this.brandImageUrl = brandImageUrl;
+        this.stampCount = stampCount;
+        this.createdDate = createdDate;
     }
 }

@@ -3,13 +3,10 @@ package com.example.couphoneserver.service;
 import com.example.couphoneserver.common.datatype.Coordinate;
 import com.example.couphoneserver.common.exception.BrandException;
 import com.example.couphoneserver.common.exception.StoreException;
-import com.example.couphoneserver.domain.CouponItemStatus;
 import com.example.couphoneserver.domain.entity.Brand;
-import com.example.couphoneserver.domain.entity.CouponItem;
 import com.example.couphoneserver.domain.entity.Store;
-import com.example.couphoneserver.dto.brand.GetBrandResponse;
-import com.example.couphoneserver.dto.store.LocationInfo;
 import com.example.couphoneserver.dto.store.GetNearbyStoreResponse;
+import com.example.couphoneserver.dto.store.LocationInfo;
 import com.example.couphoneserver.dto.store.PostStoreRequest;
 import com.example.couphoneserver.dto.store.PostStoreResponse;
 import com.example.couphoneserver.repository.BrandRepository;
@@ -38,7 +35,7 @@ public class StoreService {
     private final MemberService memberService;
     private final CoordinateConverter coordinateConverter;
 
-    private static final int ELEMENT = 4;
+    private static final int ELEMENT = 10;
 
     /*
     가게 등록
@@ -59,22 +56,20 @@ public class StoreService {
      */
     public List<GetNearbyStoreResponse> findNearbyStores(Principal principal, LocationInfo request){
         translateEPSG5181(request);
-        List<GetNearbyStoreResponse> storeList = getCandidateStoreList(request);
+        Long memberId = findMemberIdByPrincipal(principal);
+        List<GetNearbyStoreResponse> storeList =new ArrayList<>(getCandidateStoreList(request, memberId));
         Collections.sort(storeList, new Comparator<GetNearbyStoreResponse>() {
             @Override
             public int compare(GetNearbyStoreResponse o1, GetNearbyStoreResponse o2) {
-                return o1.getDistance() > o2.getDistance()? 1: -1;
+                int o1Stamp = o1.getGetBrandResponse().getStampCount();
+                int o2Stamp = o2.getGetBrandResponse().getStampCount();
+
+                if (o1Stamp < o2Stamp) return 1;
+                if (o1Stamp == o2Stamp && o1.getDistance() > o2.getDistance()) return 1;
+                return -1;
             }
         });
-        int numOfElement = storeList.size()>=ELEMENT?ELEMENT:storeList.size();
-
-        List<GetNearbyStoreResponse> resultList = storeList.subList(0,numOfElement);
-
-        for (GetNearbyStoreResponse response: resultList) {
-            response.setGetBrandResponse(getGetBrandResponse(principal, response.getBrand_id()));
-        }
-
-        return resultList;
+        return storeList;
     }
 
     private void translateEPSG5181(LocationInfo request) {
@@ -84,7 +79,7 @@ public class StoreService {
         request.setLatitude(coordinate.getLatitude());
     }
 
-    private List<GetNearbyStoreResponse> getCandidateStoreList(LocationInfo request) {
+    private Set<GetNearbyStoreResponse> getCandidateStoreList(LocationInfo request, Long memberId) {
         request.setDistance();
         double x = request.getLongitude();
         double y = request.getLatitude();
@@ -93,31 +88,37 @@ public class StoreService {
         double maxLongitude = x + radius;
         double minLatitude = y - radius;
         double maxLatitude = y + radius;
-        List<GetNearbyStoreResponse> StoreList = new ArrayList<>();
-        storeRepository.findNearbyStores(minLongitude,maxLongitude,minLatitude,maxLatitude).stream().forEach(c -> {
+        Set<GetNearbyStoreResponse> storeList = new LinkedHashSet<>();
+        storeRepository.findNearbyStores(memberId,minLongitude,maxLongitude,minLatitude,maxLatitude).stream().forEach(c -> {
             GetNearbyStoreResponse response = c.translateResponse();
             Coordinate coordinate = c.translateCoordinate();
             response.setDistance(calculateDistance(x,y,coordinate));
-            log.info(response.toString());
-            StoreList.add(response);
+            storeList.add(response);
         });
-        return StoreList;
-    }
 
-    public GetBrandResponse getGetBrandResponse(Principal principal, Long id) {
-
-        // 멤버 ID
-        Long memberId = findMemberIdByPrincipal(principal);
-
-        Brand brand = brandRepository.findById(id).get();
-
-        if (brand == null) throw new BrandException(BRAND_NOT_FOUND);
-
-        CouponItem couponItem = couponItemRepository.findByMemberIdAndBrandIdAndStatus(memberId, id, CouponItemStatus.ACTIVE);
-
-        if (couponItem == null)  // 해당 브랜드에 쿠폰이 없을 경우
-            return new GetBrandResponse(brand, 0);
-        return new GetBrandResponse(brand, couponItem.getStampCount());
+        if(storeList.size() < 10){
+            log.info("additional");
+            List<GetNearbyStoreResponse> tempList = new LinkedList<>();
+            storeRepository.findNearbyAdditional(minLongitude,maxLongitude,minLatitude,maxLatitude).stream().forEach(c -> {
+                GetNearbyStoreResponse response = c.translateResponse();
+                Coordinate coordinate = c.translateCoordinate();
+                response.setDistance(calculateDistance(x,y,coordinate));
+                tempList.add(response);
+            });
+            Collections.sort(tempList, new Comparator<GetNearbyStoreResponse>() {
+                @Override
+                public int compare(GetNearbyStoreResponse o1, GetNearbyStoreResponse o2) {
+                    return o1.getDistance() > o2.getDistance()? 1: -1;
+                }
+            });
+            int i = 0;
+            while(storeList.size() <= 10 || i >= tempList.size()) {
+                storeList.add(tempList.get(i));
+                log.info(tempList.get(i).toString());
+                i++;
+            }
+        }
+        return storeList;
     }
 
     private Long findMemberIdByPrincipal(Principal principal) {

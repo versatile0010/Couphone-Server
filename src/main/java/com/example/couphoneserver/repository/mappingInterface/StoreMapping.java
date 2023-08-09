@@ -6,21 +6,18 @@ import com.example.couphoneserver.dto.store.GetNearbyStoreResponse;
 
 import java.time.LocalDateTime;
 
-public interface StoreInfoMapping {
-
+public interface StoreMapping {
     Long getStore_id();
-    String getStoreName();
+    String getName();
     Double getLongitude();
     Double getLatitude();
     String getAddress();
-
     Long getBrand_id();
     String getBrandName();
     String getReward_description();
     String getBrand_image_url();
     LocalDateTime getCreated_date();
     Integer getStamp_Count();
-
 
     default Coordinate translateCoordinate(){
         return Coordinate.builder()
@@ -32,7 +29,7 @@ public interface StoreInfoMapping {
     default GetNearbyStoreResponse translateResponse(){
         return GetNearbyStoreResponse.builder()
                 .store_id(getStore_id())
-                .name(getStoreName())
+                .name(getName())
                 .brand_id(getBrand_id())
                 .latitude(getLatitude())
                 .longitude(getLongitude())
@@ -48,7 +45,7 @@ public interface StoreInfoMapping {
                 .brandImageUrl(getBrand_image_url())
                 .rewardDescription(getReward_description())
                 .createdDate(getCreated_date())
-                .stampCount(getStamp_Count())
+                .stampCount(0)
                 .build();
     }
 }
