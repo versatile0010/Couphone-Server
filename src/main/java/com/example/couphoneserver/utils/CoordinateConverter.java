@@ -57,8 +57,8 @@ public class CoordinateConverter {
             String y = jspoitn.get("y").toString();
 
             return new Coordinate(Double.parseDouble(x),Double.parseDouble(y));
-        } catch (StoreException | ParseException | IOException e) {
-            throw new StoreException(COORDINATE_NOT_FOUND,e.getMessage());
+        } catch (NullPointerException | ParseException | IOException e) {
+            throw new StoreException(COORDINATE_NOT_FOUND);
         }
     }
 
@@ -91,8 +91,8 @@ public class CoordinateConverter {
             }
 
             return address;
-        } catch (StoreException | ParseException | IOException e) {
-            throw new StoreException(COORDINATE_NOT_FOUND,e.getMessage());
+        } catch (NullPointerException | ParseException | IOException e) {
+            throw new StoreException(COORDINATE_NOT_FOUND);
         }
     }
 
