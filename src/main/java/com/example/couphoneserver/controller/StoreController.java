@@ -70,13 +70,15 @@ public class StoreController {
             @Parameter(name = "longitude", description = "경도", example = "207005.189144674", in = ParameterIn.QUERY) @RequestParam Double longitude,
             @Parameter(name = "latitude", description = "위도", example = "449492.810069438", in = ParameterIn.QUERY) @RequestParam Double latitude,
             @Parameter(name = "is1km", description = "버튼 누른 경우 true", in = ParameterIn.QUERY) @RequestParam Boolean is1km,
+            @Parameter(name = "query", description = "키워드(선택)", in = ParameterIn.QUERY)
+            @RequestParam(required = false) String query,
             Principal principal) {
         return new BaseResponse<>(storeService.findNearbyStores(principal,
                 LocationInfo.builder()
                         .longitude(longitude)
                         .latitude(latitude)
                         .is1km(is1km)
-                        .build()));
+                        .build(), query));
     }
 
 }

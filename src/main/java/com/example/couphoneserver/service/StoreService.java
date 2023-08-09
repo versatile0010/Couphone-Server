@@ -47,10 +47,12 @@ public class StoreService {
     /*
     가게 조회
      */
-    public List<GetNearbyStoreResponse> findNearbyStores(Principal principal, LocationInfo request){
+    public List<GetNearbyStoreResponse> findNearbyStores(Principal principal, LocationInfo request, String query){
 //        translateEPSG5181(request);
+        if(query == null) query = "%%";
+        else query = "%"+query+"%";
         Long memberId = findMemberIdByPrincipal(principal);
-        List<GetNearbyStoreResponse> storeList =new ArrayList<>(getCandidateStoreList(request, memberId));
+        List<GetNearbyStoreResponse> storeList =new ArrayList<>(getCandidateStoreList(request, memberId, query));
         storeList.sort((o1, o2) -> {
             int o1Stamp = o1.getGetBrandResponse().getStampCount();
             int o2Stamp = o2.getGetBrandResponse().getStampCount();
@@ -69,7 +71,7 @@ public class StoreService {
 //        request.setLatitude(coordinate.getLatitude());
 //    }
 
-    private Set<GetNearbyStoreResponse> getCandidateStoreList(LocationInfo request, Long memberId) {
+    private Set<GetNearbyStoreResponse> getCandidateStoreList(LocationInfo request, Long memberId, String query) {
         request.setDistance();
         double x = request.getLongitude();
         double y = request.getLatitude();
@@ -79,7 +81,7 @@ public class StoreService {
         double minLatitude = y - radius;
         double maxLatitude = y + radius;
         Set<GetNearbyStoreResponse> storeList = new LinkedHashSet<>();
-        storeRepository.findNearbyStores(memberId,minLongitude,maxLongitude,minLatitude,maxLatitude).stream().forEach(c -> {
+        storeRepository.findNearbyStores(memberId,minLongitude,maxLongitude,minLatitude,maxLatitude,query).stream().forEach(c -> {
             GetNearbyStoreResponse response = c.translateResponse();
             Coordinate coordinate = c.translateCoordinate();
             response.setDistance(calculateDistance(x,y,coordinate));
@@ -89,7 +91,7 @@ public class StoreService {
         if(storeList.size() < 10){
             log.info("additional");
             List<GetNearbyStoreResponse> tempList = new LinkedList<>();
-            storeRepository.findNearbyAdditional(minLongitude,maxLongitude,minLatitude,maxLatitude).stream().forEach(c -> {
+            storeRepository.findNearbyAdditional(minLongitude,maxLongitude,minLatitude,maxLatitude,query).stream().forEach(c -> {
                 GetNearbyStoreResponse response = c.translateResponse();
                 Coordinate coordinate = c.translateCoordinate();
                 response.setDistance(calculateDistance(x,y,coordinate));
