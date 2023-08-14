@@ -18,8 +18,16 @@
 <img src="https://github.com/KUIT-Couphone/.github/assets/96612168/81e0e757-8507-4b49-930e-bc66f2ba784c" alt="Example Image" width="850" height="400">
 
 ---
-## 🧱 Domain Diagram
+## 🧱 기여한 부분
 
+|No| content | blog link |
+|------|---|---|
+|01.| ERD 설계 및 기본 구조 구현 | [관련 포스팅 작성 예정]|
+|02.| Spring security 인증/인가 관련 구현 | [관련 포스팅 작성 예정] |
+|03.| access token, refresh token 발급 로직 구현|[관련 포스팅 작성 예정]|
+|04.| 회원 관련 API , 테스트 코드 구현 |[관련 포스팅 작성 예정]|
+|05.| couphone 비지니스 모델에 대한 고찰  | [관련 포스팅 작성 예정] |
 
+⚒️ 업데이트 중
 
  
