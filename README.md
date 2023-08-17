@@ -25,7 +25,7 @@
 |01.| couphone 비지니스 모델에 대한 고찰  | [관련 포스팅 작성 예정] |
 |02.| ERD 설계 및 기본 구조 구현 | [관련 포스팅 작성 예정]|
 |03.| Spring security 인증/인가 관련 구현 | [관련 포스팅 작성 예정] |
-|04.| access token, refresh token 발급 로직 구현|[관련 포스팅 작성 예정]|
+|04.| access token, refresh token 발급 로직 구현|[처음 구현해보는 access/refresh token 발급 로직](https://usedto-wonderwhy.tistory.com/220)|
 |05.| 회원 관련 API , 테스트 코드 구현 |[관련 포스팅 작성 예정]|
 |06.| jwt 기반 로그인 구현  | [관련 포스팅 작성 예정] |
 |07.| git action 으로 CI 하기  | [관련 포스팅 작성 예정] |
